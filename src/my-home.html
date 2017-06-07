@@ -1,0 +1,220 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../bower_components/polymer/lib/mixins/gesture-event-listeners.html">
+
+<link rel="import" href="../bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
+<link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
+
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/iron-icons/communication-icons.html">
+
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+
+<link rel="import" href="../bower_components/polymerfire/firebase-auth.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-query.html">
+
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="my-home">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: block;
+
+        padding: 10px;
+      }
+
+      app-drawer-layout:not([narrow]) [drawer-toggle] {
+        display: none;
+      }
+
+      app-header {
+        color: #fff;
+        background-color: var(--default-primary-color);
+      }
+
+      app-header paper-icon-button {
+        --paper-icon-button-ink-color: white;
+      }
+
+      .drawer-list {
+        margin: 0 20px;
+      }
+
+      .drawer-list a {
+        display: block;
+        padding: 0 16px;
+        text-decoration: none;
+        color: var(--accent-color);
+        line-height: 40px;
+      }
+
+      .drawer-list a.iron-selected {
+        color: black;
+        font-weight: bold;
+      }
+
+      .container {
+        display: -webkit-flex;
+        display: flex;
+        -webkit-justify-content: center;
+        justify-content: center;
+        -webkit-flex-wrap: wrap;
+        flex-wrap: wrap;
+          margin-top: 15px;
+            padding: 1.5%;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+      }
+
+    paper-card {
+      max-width: 400px;
+      position: relative;
+      margin-bottom: 20px;
+      margin-right: 10px;
+      margin-left: 10px;
+    }
+
+      paper-card{
+        --paper-card-header-image:{
+           height:256px;
+           width:400px;
+           object-fit: cover;
+        };
+      }
+
+    	@media (max-width: 400px) {
+        paper-card {
+		width: 100%;
+        }
+	}
+  .cafe-header { @apply --paper-font-headline; }
+  .cafe-light { color: var(--paper-grey-600); }
+  .cafe-location {
+    float: right;
+    font-size: 15px;
+    vertical-align: middle;
+  }
+  .cafe-reserve { color: var(--google-blue-500); }
+  iron-icon.star {
+    --iron-icon-width: 16px;
+    --iron-icon-height: 16px;
+    color: var(--paper-amber-500);
+  }
+  iron-icon.star:last-of-type { color: var(--paper-grey-500); }
+
+    </style>
+
+    <firebase-auth
+      id="FBAuth"
+      user="{{user}}">
+    </firebase-auth>
+    <firebase-query
+      id="FBQuery"
+      path="/cases"
+      data="{{userCases}}">
+    </firebase-query>
+
+    <app-drawer-layout fullbleed>
+      <!-- Drawer content -->
+      <app-drawer id="drawer" slot="drawer">
+        <app-toolbar>Menu</app-toolbar>
+        Welcome {{user.displayName}}
+        <button on-tap="_handleLogout">Logout</button>
+      </app-drawer>
+
+      <!-- Main content -->
+      <app-header-layout has-scrolling-region>
+
+        <app-header slot="header" condenses reveals effects="waterfall">
+          <app-toolbar>
+            <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
+            <div main-title>DLine</div>
+          </app-toolbar>
+        </app-header>
+
+<div class="container">
+       <template is="dom-repeat" items="{{userCases}}" as="case">
+         <!--<li>[[case.title]]</li>-->
+         <paper-card image="[[case.cover]]">
+  <div class="card-content">
+    <div class="cafe-header">[[case.title]]
+      <div class="cafe-location cafe-light">
+        <iron-icon icon="communication:location-on"></iron-icon>
+        <span>Status (done/or not)</span>
+      </div>
+    </div>
+    <div class="cafe-rating">
+      <!-- tags -->
+      <iron-icon class="star" icon="star"></iron-icon>
+      <iron-icon class="star" icon="star"></iron-icon>
+      <iron-icon class="star" icon="star"></iron-icon>
+      <iron-icon class="star" icon="star"></iron-icon>
+      <iron-icon class="star" icon="star"></iron-icon>
+    </div>
+    <p>Author・[[case.author]]</p>
+    <p class="cafe-light">[[case.description]]</p>
+  </div>
+  <div class="card-actions">
+    <div class="horizontal justified">
+      <a name="view3" href="/case/[[case.id]]"><paper-button class="cafe-reserve">Case</paper-button></a>
+      <a name="view3" href="/contouring/[[case.id]]"><paper-button class="cafe-reserve">Contouring</paper-button></a>    
+    </div>
+  </div>
+</paper-card>
+       </template>
+</div>
+      </app-header-layout>
+    </app-drawer-layout>
+  </template>
+
+  <script>
+    class MyHome extends Polymer.GestureEventListeners(Polymer.Element) {
+      static get is() { return 'my-home'; }
+
+      static get properties() {
+        return {
+          page: {
+            type: String,
+            reflectToAttribute: true,
+          },
+          user: {
+            type: Object,
+            value: {},
+          },
+          userCases: {
+            type: Array,
+            value: [],
+          },
+        };
+      }
+
+      _handleLogout() {
+        console.log('out...');
+        console.log(this.$.FBAuth);
+        this.$.FBAuth.signOut();
+      }
+
+      // _handleSaveCase() {
+      //   const timeStamp = new Date();
+      //   this.$.FBQuery.ref.push({
+      //     timeStamp: String(timeStamp),
+      //   });
+      // }
+
+      // _handleRemove(event) {
+      //   const key = event.currentTarget.userCase.$key;
+      //   this.$.FBQuery.ref.child(key).remove();
+      // }
+    }
+
+    window.customElements.define(MyHome.is, MyHome);
+  </script>
+</dom-module>

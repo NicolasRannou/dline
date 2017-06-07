@@ -1,0 +1,138 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/app-route/app-location.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="my-icons.html">
+
+<link rel="import" href="../bower_components/polymerfire/firebase-app.html">
+
+<link rel="lazy-import" href="my-login.html">
+<link rel="lazy-import" href="my-home.html">
+<link rel="lazy-import" href="my-case.html">
+<link rel="lazy-import" href="my-view404.html">
+
+<dom-module id="my-app">
+  <template>
+    <style>
+      :host {
+        --dark-primary-color:       #546e7a;
+        --default-primary-color:    #607d8b;
+        --light-primary-color:      #b0bec5;
+        --text-primary-color:       #FFFFFF;
+        --accent-color:             #FF4081;
+        --primary-background-color: #BBDEFB;
+        --primary-text-color:       #212121;
+        --secondary-text-color:     #757575;
+        --disabled-text-color:      #BDBDBD;
+        --divider-color:            #BDBDBD;
+
+        display: block;
+      }
+    </style>
+
+    <app-location route="{{route}}"></app-location>
+    <app-route
+        route="{{route}}"
+        pattern="[[rootPattern]]:page/:subpage"
+        data="{{routeData}}"
+        tail="{{subroute}}"></app-route>
+
+    <firebase-app
+      auth-domain="arcol-7df61.firebaseapp.com"
+      database-url="https://arcol-7df61.firebaseio.com/"
+      api-key="AIzaSyAjmxtyHTz7Lv5Uy971OSK88nlvkF6zno0">
+    </firebase-app>
+
+    <iron-pages
+        selected="[[page]]"
+        attr-for-selected="name"
+        fallback-selection="view404"
+        role="main">
+      <my-login
+        name="login"
+        signed-in="{{signedIn}}"></my-login>
+      <my-home
+        name="home"></my-home>
+      <my-case
+        name="case"
+        route-data="[[routeData]]"></my-case>
+      <my-view404
+        name="view404"></my-view404>
+    </iron-pages>
+  </template>
+
+  <script>
+    class MyApp extends Polymer.Element {
+
+      static get is() { return 'my-app'; }
+
+      static get properties() {
+        return {
+          page: {
+            type: String,
+            reflectToAttribute: true,
+            observer: '_pageChanged',
+          },
+          rootPattern: String,
+          routeData: Object,
+          subroute: String,
+          signedIn: {
+            type: Boolean,
+            observer: '_signedInChanged',
+          },
+        };
+      }
+
+      static get observers() {
+        return [
+          '_routePageChanged(routeData.page)',
+        ];
+      }
+
+      constructor() {
+        super();
+
+        // Get root pattern for app-route, for more info about `rootPath` see:
+        // https://www.polymer-project.org/2.0/docs/upgrade#urls-in-templates
+        this.rootPattern = (new URL(this.rootPath)).pathname;
+      }
+
+      _routePageChanged(page) {
+        // Polymer 2.0 will call with `undefined` on initialization.
+        // Ignore until we are properly called with a string.
+        if (page === undefined) {
+          return;
+        }
+
+        // If no page was found in the route data, page will be an empty string.
+        // Deault to 'view1' in that case.
+        this.page = page || 'login';
+      }
+
+      _pageChanged(page) {
+        // Load page import on demand. Show 404 page if fails
+        var resolvedPageUrl = this.resolveUrl('my-' + page + '.html');
+        Polymer.importHref(
+            resolvedPageUrl,
+            null,
+            this._showPage404.bind(this),
+            true);
+      }
+
+      _showPage404() {
+        this.page = 'view404';
+      }
+
+      _signedInChanged(signedIn) {
+        console.log(signedIn);
+        if (signedIn) {
+          this.set('routeData.page', 'home');
+        } else {
+          this.set('routeData.page', 'login');
+        }
+      }
+    }
+
+    window.customElements.define(MyApp.is, MyApp);
+  </script>
+</dom-module>

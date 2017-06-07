@@ -1,0 +1,233 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/polymer/lib/elements/dom-if.html">
+<link rel="import" href="shared-styles.html">
+
+<link rel="import" href="../bower_components/polymerfire/firebase-auth.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+
+<dom-module id="my-login">
+  <template>
+    <style include="shared-styles">
+    :host {
+      display: flex;
+      position: absolute;
+      top: 0;
+      right: 0;
+      left: 0;
+      bottom: 0;
+      background-color: var(--dark-primary-color);
+    }
+
+    .container{
+      max-width: 800px;
+      margin: auto;
+      margin-top: 60px;
+      margin-bottom: 60px;
+      position: relative;
+      display:flex;
+      flex-direction:column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    firebase-auth{
+      display: none;
+    }
+
+    #reset{
+      color: grey;
+      text-decoration: none;
+      font-size: 12px;
+      font-style: italic;
+      font-weight: lighter;
+    }
+
+    #reset:hover{
+      color: grey;
+      text-decoration: underline;
+    }
+
+    #emailPWError {
+      color: var(--error-color);
+      text-align: center;
+      font-size: 16px;
+      font-weight: 500;
+      line-height: 24px;
+      margin: 0;
+      padding: 0;
+    }
+
+    #emailPWMessage {
+      color: var(--primary-color);
+      text-align: center;
+      font-size: 16px;
+      font-weight: 500;
+      line-height: 24px;
+      margin: 0;
+      padding: 0;
+    }
+
+    form{
+      min-width: 200px;
+      margin: 0 auto;
+    }
+    </style>
+
+    <firebase-auth
+      id="FBAuth"
+      user="{{user}}"
+      signed-in="{{signedIn}}"
+      status-known="{{statusKnown}}"
+      on-error="_handleEmailPWError">
+    </firebase-auth>
+
+    <div class="container">
+      <div class="card">
+        <div>
+          <div id="emailPWError"></div>
+          <div id="emailPWMessage"></div>
+        </div>
+        <form on-submit="_signInEmailPW">
+          <paper-input id="emailInput" type="email" label="Email" value="{{email}}" validator="email-validator" error-message="Invalid email address" required auto-validate></paper-input>
+          <paper-input id="pwInput" type="password" label="Password" value="{{pw}}" required></paper-input>
+          <p><a href="#" id="reset" on-click="_resetPW">Reset password for entered email</a></p>
+          <paper-button id="emailSignUp" type="submit" on-tap="_signUpEmailPW" hidden$="[[noSignUp]]">Sign Up</paper-button>
+          <paper-button id="emailSignIn" type="submit" on-tap="_signInEmailPW">Sign In</paper-button>
+        </form>
+      </div>
+    </div>
+
+  </template>
+
+  <script>
+    class MyLogin extends Polymer.Element {
+      static get is() { return 'my-login'; }
+
+      static get properties() {
+        return {
+          /**
+          * `user` represents the user object returned by the firebase-auth element
+          */
+          user: {
+            type: Object,
+            value: {},
+            observer: '_userChanged',
+            notify: true,
+            reflectToAttribute: true
+          },
+          /**
+          * `signedIn` represents the signed in state returned by the firebase-auth element
+          */
+          signedIn: {
+            type: Boolean,
+            notify: true,
+            reflectToAttribute: true
+          },
+          /**
+          * `allows to set custom password reset message `
+          */
+          passwordResetMessage: {
+            type: String,
+            value:  "Password reset email has been sent. Please check your inbox.",
+          },
+          /**
+          * If true, SignUp will be hidden.
+          */
+          noSignUp: {
+            type: Boolean,
+            value: false,
+          },
+          /**
+          * If true, will sign up a user who attempts to sign in with an account that doesn't already exist
+          */
+          autoSignUp: {
+            type: Boolean,
+            value: false,
+          },
+          /**
+          * `statusKnown` represents the status known state returned by the firebase-auth element
+          */
+          statusKnown: {
+            type: Boolean,
+            notify: true,
+          },
+        };
+      }
+
+      _userChanged(user) {
+        if (user === undefined || user === null) {
+          return;
+        }
+
+        if (!(Object.keys(user).length === 0 && user.constructor === Object)) {
+          const signedIn = new CustomEvent(
+            'signed-in',
+            {
+              detail: {
+                user,
+              },
+              bubbles: true,
+              composed: true,
+            }
+          );
+          this.dispatchEvent(signedIn);
+        }
+      }
+
+      _cleanMessages() {
+        this.$.emailPWError.textContent = '';
+        this.$.emailPWMessage.textContent = '';
+      }
+
+      _signInEmailPW(e) {
+        this._cleanMessages();
+        this.$.FBAuth.signInWithEmailAndPassword(this.email, this.pw);
+      }
+
+      _signUpEmailPW(e) {
+        if (this.noSignUp) return;
+        this._cleanMessages();
+        this.$.FBAuth.createUserWithEmailAndPassword(this.email, this.pw);
+      }
+
+      _handleEmailPWError(err) {
+        if(err.detail.code === "auth/user-not-found" && this.autoSignUp){
+          this.$.FBAuth.createUserWithEmailAndPassword(this.email, this.pw)
+          this.email = null;
+          this.pw = null;
+        } else {
+          this.$.emailPWError.textContent = err.detail.message;
+        }
+      }
+  
+      _resetPW() {
+        this._cleanMessages();
+        if (this.email) {
+          this.$.FBAuth.auth.sendPasswordResetEmail(this.email)
+          .then(
+            () => {
+              this.$.emailPWMessage.textContent = this.passwordResetMessage;
+            },
+            (err) => {
+              this.$.emailPWError.textContent = err.message;
+            }
+          );
+        } else {
+          this.$.emailPWError.textContent = "Please enter a valid email address.";
+        }
+      }
+
+      /**
+       * Signs out the signed in user
+       */
+      signOut() {
+        if (this.signedIn) {
+          this.$.FBAuth.signOut();
+        }
+      }
+    }
+
+    window.customElements.define(MyLogin.is, MyLogin);
+  </script>
+</dom-module>
