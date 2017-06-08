@@ -112,7 +112,6 @@
           user: {
             type: Object,
             value: {},
-            observer: '_userChanged',
             notify: true,
             reflectToAttribute: true
           },
@@ -153,26 +152,6 @@
             notify: true,
           },
         };
-      }
-
-      _userChanged(user) {
-        if (user === undefined || user === null) {
-          return;
-        }
-
-        if (!(Object.keys(user).length === 0 && user.constructor === Object)) {
-          const signedIn = new CustomEvent(
-            'signed-in',
-            {
-              detail: {
-                user,
-              },
-              bubbles: true,
-              composed: true,
-            }
-          );
-          this.dispatchEvent(signedIn);
-        }
       }
 
       _cleanMessages() {

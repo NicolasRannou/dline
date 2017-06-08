@@ -2,10 +2,11 @@
 <link rel="import" href="../bower_components/app-route/app-location.html">
 <link rel="import" href="../bower_components/app-route/app-route.html">
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
-<link rel="import" href="my-icons.html">
 
 <link rel="import" href="../bower_components/polymerfire/firebase-app.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-auth.html">
 
+<link rel="import" href="my-icons.html">
 <link rel="lazy-import" href="my-login.html">
 <link rel="lazy-import" href="my-home.html">
 <link rel="lazy-import" href="my-case.html">
@@ -43,14 +44,18 @@
       api-key="AIzaSyAjmxtyHTz7Lv5Uy971OSK88nlvkF6zno0">
     </firebase-app>
 
+    <firebase-auth
+      id="FBAuth"
+      signed-in="{{signedIn}}">
+    </firebase-auth>
+
     <iron-pages
         selected="[[page]]"
         attr-for-selected="name"
         fallback-selection="view404"
         role="main">
       <my-login
-        name="login"
-        signed-in="{{signedIn}}"></my-login>
+        name="login"></my-login>
       <my-home
         name="home"></my-home>
       <my-case
@@ -74,7 +79,6 @@
             observer: '_pageChanged',
           },
           rootPattern: String,
-          routeData: Object,
           subroute: String,
           signedIn: {
             type: Boolean,
@@ -98,15 +102,18 @@
       }
 
       _routePageChanged(page) {
-        // Polymer 2.0 will call with `undefined` on initialization.
-        // Ignore until we are properly called with a string.
-        if (page === undefined) {
+        // wait for sign in to match page
+        if(!this.signedIn && page !== 'login') {
+          return;
+        }
+
+        if(this.signedIn && page === 'login') {
           return;
         }
 
         // If no page was found in the route data, page will be an empty string.
-        // Deault to 'view1' in that case.
-        this.page = page || 'login';
+        // Deault to 'home' in that case.
+        this.page = page || 'home';
       }
 
       _pageChanged(page) {
@@ -124,11 +131,11 @@
       }
 
       _signedInChanged(signedIn) {
-        console.log(signedIn);
         if (signedIn) {
           this.set('routeData.page', 'home');
         } else {
           this.set('routeData.page', 'login');
+          this.set('routeData.subpage', '');
         }
       }
     }

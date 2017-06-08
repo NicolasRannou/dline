@@ -19,6 +19,8 @@
 <link rel="import" href="../bower_components/polymerfire/firebase-auth.html">
 <link rel="import" href="../bower_components/polymerfire/firebase-query.html">
 
+<link rel="import" href="my-icons.html">
+
 <link rel="import" href="shared-styles.html">
 
 <dom-module id="my-home">
@@ -126,8 +128,12 @@
       <!-- Drawer content -->
       <app-drawer id="drawer" slot="drawer">
         <app-toolbar>Menu</app-toolbar>
-        Welcome {{user.displayName}}
-        <button on-tap="_handleLogout">Logout</button>
+        Logged in as {{user.email}}
+        <template is="dom-repeat" items="{{tags}}" as="tag">
+          <div>
+            [[tag]]
+          </div>
+        </template>
       </app-drawer>
 
       <!-- Main content -->
@@ -137,6 +143,7 @@
           <app-toolbar>
             <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
             <div main-title>DLine</div>
+            <paper-button on-tap="_handleLogout">Logout</paper-button>
           </app-toolbar>
         </app-header>
 
@@ -185,9 +192,14 @@
             type: String,
             reflectToAttribute: true,
           },
+          tags: {
+            type: Array,
+            value: [],
+          },
           user: {
             type: Object,
             value: {},
+            observer: '_userChanged',
           },
           userCases: {
             type: Array,
@@ -196,23 +208,39 @@
         };
       }
 
+      static get observers() {
+        return [
+          '_userCasesChanged(userCases.splices)',
+        ];
+      }
+
+      _userChanged(user) {
+        console.log(user);
+      }
+
+      _userCasesChanged(userCases) {
+        if (userCases === undefined) {
+          return;
+        }
+        
+        const tagSet = new Set();
+        const object = userCases.indexSplices[0].object;
+        for (const singlecase of object) {
+          const tagList = singlecase.tags;
+          for (const tag of tagList) {
+            tagSet.add(tag);
+          }
+        }
+
+        this.set('tags', Array.from(tagSet));
+        console.log(this.tags);
+      }
+
       _handleLogout() {
         console.log('out...');
         console.log(this.$.FBAuth);
         this.$.FBAuth.signOut();
       }
-
-      // _handleSaveCase() {
-      //   const timeStamp = new Date();
-      //   this.$.FBQuery.ref.push({
-      //     timeStamp: String(timeStamp),
-      //   });
-      // }
-
-      // _handleRemove(event) {
-      //   const key = event.currentTarget.userCase.$key;
-      //   this.$.FBQuery.ref.child(key).remove();
-      // }
     }
 
     window.customElements.define(MyHome.is, MyHome);
