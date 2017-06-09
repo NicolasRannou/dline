@@ -29,6 +29,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/polymerfire/firebase-auth.html">
 <link rel="import" href="../bower_components/polymerfire/firebase-query.html">
 
+<link rel="import" href="elements/ami-viewer-2D.html">
 
 <link rel="import" href="my-icons.html">
 <link rel="import" href="shared-styles.html">
@@ -57,6 +58,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         background-color: red;
       }
 
+      .main, .small {
+        display: flex;
+      }
+
       paper-slider {
         width: 100%;
       }
@@ -69,9 +74,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       .small {
         width: 30%;
         background-color: yellow;
+        flex-direction: column;
       }
 
-      .small > div {
+      .small > * {
         height: 50%;
       }
 
@@ -136,11 +142,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </div>
       <div class="viewers">
         <div class="main">
-          <paper-slider></paper-slider>
+          <ami-viewer-2d
+            id="first"
+            class="viewers"
+            stack-scene="[[stackScenes.0]]"
+            contours="[[contours]]"></ami-viewer-2d>
         </div>
         <div class="small">
-          <div><paper-slider></paper-slider></div>
-          <div><paper-slider></paper-slider></div>
+          <ami-viewer-2d
+            id="second"
+            class="viewers"
+            stack-scene="[[stackScenes.1]]"
+            contours="[[contours]]"></ami-viewer-2d>
+          <ami-viewer-2d
+            id="third"
+            class="viewers"
+            stack-scene="[[stackScenes.2]]"
+            contours="[[contours]]"></ami-viewer-2d>
         </div>
       </div>
   </div>
@@ -163,7 +181,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           page: {
             type: String,
             reflectToAttribute: true,
-            observer: '_pageChanged',
           },
           user: {
             type: Object,
@@ -174,6 +191,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           },
           userCase: {
             type: {},
+            observer: '_userCaseChanged',
           },
           contour: {
             type: String,
@@ -190,7 +208,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           titleIndex: {
             type: Number,
             value: -1,
-          }
+          },
+          // scenes...
+          series: {
+            type: Object,
+            value: {},
+          },
+          stack: {
+            type: Object,
+            value: {},
+          },
+          stackScenes: {
+            type: Array,
+            value: [],
+          },
+          contours: {
+            type: Array,
+            value: [],
+          },
         };
       }
 
@@ -199,6 +234,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           '_routePageChanged(routeData.*)',
           '_casesChanged(cases.splices)',
         ];
+      }
+
+      ready() {
+        super.ready();
+
+        // renderers
       }
 
       _routePageChanged(routeData) {
@@ -213,21 +254,64 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.page = routeData.value.subpage;
       }
 
-      _pageChanged(page) {
-        if (page === '') {
-          return;
-        }
-
-        // fetch the data
-        // images, models and
-      }
-
       _casesChanged(cases) {
-        if (cases === undefined) {
+        if (cases === undefined ||
+        cases.indexSplices[0].object.length !== 1) {
           return;
         }
 
         this.set('userCase', cases.indexSplices[0].object[0])
+      }
+
+      _userCaseChanged(userCase) {
+        if (userCase === null ||
+        !userCase.id) {
+          return;
+        }
+
+        // fetch new data
+        let loader = new AMI.default.Loaders.Volume();
+        loader.load([userCase.image])
+        .then((series) => {
+            // merge series
+            const mergedSeries = series[0].mergeSeries(series);
+            const firstSeries = mergedSeries[0];
+            return firstSeries;
+          })
+        .then((series) => {
+          console.log(series);
+          this.set('series', series);
+          
+          // create stack scenes
+          const stack = series.stack[0];
+          const stackHelper0 = new AMI.default.Helpers.Stack(stack);
+          stackHelper0.orientation = 0;
+          const stackScene0 = new THREE.Scene();
+          stackScene0.add(stackHelper0);
+
+          const stackHelper1 = new AMI.default.Helpers.Stack(stack);
+          stackHelper1.orientation = 1;
+          const stackScene1 = new THREE.Scene();
+          stackScene1.add(stackHelper1);
+
+          const stackHelper2 = new AMI.default.Helpers.Stack(stack);
+          stackHelper2.orientation = 2;
+          const stackScene2 = new THREE.Scene();
+          stackScene2.add(stackHelper2);
+
+          const stackScenes = [stackScene0, stackScene1, stackScene2];
+          this.set('stackScenes', stackScenes);
+          console.log(this.stackScenes);
+          this.$.first.resize();
+          this.$.second.resize();
+          this.$.third.resize();
+        });
+
+        // fetch meshes
+        // push in mesh array
+
+        // _meshesChanged
+        // push it to viewers
       }
 
       _submitAnswer() {
@@ -247,9 +331,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       _selectionDone(contour, choice, title) {
-        console.log(contour);
-        console.log(choice);
-        console.log(title);
         return !(contour !== '' && choice !== '' && title !== '');
       }
     }

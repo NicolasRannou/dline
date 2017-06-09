@@ -86,9 +86,30 @@
 
       paper-card{
         --paper-card-header-image:{
-           height:256px;
-           width:400px;
+              -moz-transition: all 0.3s;
+  -webkit-transition: all 0.3s;
+  transition: all 0.3s;
+           height: 256px;
+           width: 400px;
            object-fit: cover;
+                      -webkit-filter: sepia(.5);
+  filter: sepia(.5);
+        };
+      }
+
+            paper-card:hover{
+        --paper-card-header-image:{
+                     height: 256px;
+           width: 400px;
+           object-fit: cover;
+           -webkit-filter: none;
+  filter: none;
+    -moz-transition: all 0.3s;
+  -webkit-transition: all 0.3s;
+  transition: all 0.3s;
+  -moz-transform: scale(1.1);
+  -webkit-transform: scale(1.1);
+  transform: scale(1.1);
         };
       }
 

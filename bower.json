@@ -26,7 +26,9 @@
     "web-animations-js": "web-animations/web-animations-js#2.2.5",
     "paper-radio-button": "PolymerElements/paper-radio-button#^2.0.0",
     "paper-radio-group": "PolymerElements/paper-radio-group#^2.0.0",
-    "paper-slider": "PolymerElements/paper-slider#^2.0.0"
+    "paper-slider": "PolymerElements/paper-slider#^2.0.0",
+    "three.js": "mrdoob/three.js#dev",
+    "ami": "fnndsc/ami#dev"
   },
   "resolutions": {
     "iron-flex-layout": "1 - 2",
