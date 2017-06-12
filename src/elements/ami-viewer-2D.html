@@ -198,12 +198,12 @@
         this._clipPlane = null;
         this.stackHelper = null;
         this.orientation = 'default';
-        this.clipPlane = new THREE.Plane(new THREE.Vector3(0, 0, 0), 0);
 
         this._initScene();
         this._initCamera();
         this._initControls();
         this._initRenderer();
+        this._initContours();
 
         // attach event listeners
         this._controls.addEventListener('OnScroll', this._onScrollBound);
@@ -254,6 +254,48 @@
         this._container.appendChild( this._renderer.domElement );
       }
 
+      _initContours() {
+        this.clipPlane = new THREE.Plane(new THREE.Vector3(0, 0, 0), 0);
+
+        // texture target for offline rendering
+        this._contourTextureTarget = new THREE.WebGLRenderTarget(
+          this._container.clientWidth,
+          this._container.clientHeight,
+          {
+            minFilter: THREE.LinearFilter,
+            magFilter: THREE.NearestFilter,
+            format: THREE.RGBAFormat,
+          }
+        );
+
+        // material
+        const uniformsLayerMix = AMI.default.Shaders.ContourUniform.uniforms();
+        uniformsLayerMix.uTextureFilled.value =
+          this._contourTextureTarget.texture;
+        uniformsLayerMix.uWidth.value = 1.0;
+        uniformsLayerMix.uCanvasWidth.value =
+         this._contourTextureTarget.width;
+        uniformsLayerMix.uCanvasHeight.value =
+          this._contourTextureTarget.height;
+
+        const fls = new AMI.default.Shaders.ContourFragment(uniformsLayerMix);
+        const vls = new AMI.default.Shaders.ContourVertex();
+        this._contourMaterial = new THREE.ShaderMaterial({
+          side: THREE.DoubleSide,
+          uniforms: uniformsLayerMix,
+          vertexShader: vls.compute(),
+          fragmentShader: fls.compute(),
+          transparent: true,
+          extensions: {
+            derivatives: true,
+          },
+        });
+
+        // mesh and scene
+        this._contourMesh = null;
+        this._contourScene = new THREE.Scene();
+      }
+
       _animate() {
         this.animationFrameID = requestAnimationFrame(() => {this._animate()} );
         this._controls.update();
@@ -278,7 +320,12 @@
       }
 
       _onStackIndexChanged () {
+        this._updateContours();
         this._updateClipPlane();
+      }
+
+      _updateContours() {
+        
       }
 
       // when index changes.
@@ -361,19 +408,25 @@
 
       resize() {
         if (this.stackHelper) {
+          const height = this._container.clientHeight;
+          const width = this._container.clientWidth;
           const canvas = {
-            width: this._container.clientWidth,
-            height: this._container.clientHeight,
+            width: width,
+            height: height,
           };
 
           this._camera.canvas = canvas;
           this._camera.fitBox(2, 1);
 
-          this._renderer.setSize(this._container.clientWidth, this._container.clientHeight);
+          this._renderer.setSize(width, height);
 
           // update info to draw borders properly
-          this.stackHelper.slice.canvasWidth = this._container.clientWidth;
-          this.stackHelper.slice.canvasHeight = this._container.clientHeight;
+          this.stackHelper.slice.canvasWidth = width;
+          this.stackHelper.slice.canvasHeight = height;
+
+          //
+          this._contourTextureTarget.width = width;
+          this._contourTextureTarget.height = height;
         }
       }
 
