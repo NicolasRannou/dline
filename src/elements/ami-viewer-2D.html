@@ -178,11 +178,13 @@
         super();
         this._onScrollBound = this._onScroll.bind(this);
         this._onMouseMoveBound = this._onMouseMove.bind(this);
+        this._onDoubleClickBound = this._onDoubleClick.bind(this);
       }
 
       disconnectedCallback() {
         super.disconnectedCallback();
         this._controls.removeEventListener('OnScroll', this._onScrollBound);
+        this._container.removeEventListener('dblclick', this._onDoubleClickBound);
         this._container.removeEventListener('mousemove', this._onMouseMoveBound);
       }
 
@@ -207,6 +209,7 @@
 
         // attach event listeners
         this._controls.addEventListener('OnScroll', this._onScrollBound);
+        this._container.addEventListener('dblclick', this._onDoubleClickBound);
         this._container.addEventListener('mousemove', this._onMouseMoveBound);
 
         // add dummy cube for testing
@@ -217,8 +220,6 @@
         });
         this._mesh = new THREE.Mesh(geometry, material);
         this._scene.add(this._mesh);
-
-        this._animate();
       }
 
       _initScene() {
@@ -265,7 +266,7 @@
             minFilter: THREE.LinearFilter,
             magFilter: THREE.NearestFilter,
             format: THREE.RGBAFormat,
-          }
+          },
         );
 
         // material
@@ -296,6 +297,16 @@
         this._contourScene = new THREE.Scene();
       }
 
+      startRenderingLoop() {
+        console.log('start rendering');
+        this._animate();
+      }
+
+      stopRenderingLoop() {
+        console.log('stop rendering');
+        window.cancelAnimationFrame(this.animationFrameID);
+        this.animationFrameID = undefined;
+      }
       _animate() {
         this.animationFrameID = requestAnimationFrame(() => {this._animate()} );
         this._controls.update();
@@ -310,22 +321,38 @@
           this.contours.forEach((object, key) => {
             object.materialFront.clippingPlanes = [this.clipPlane];
             object.materialBack.clippingPlanes = [this.clipPlane];
-            // this.renderer.render(object, camera, contourTextureTarget, true);
-            // renderer.clearDepth();
-            // contourMaterial.uniforms.uWidth.value = 1;
-            //   object.selected ? 5 : 1;
-            this._renderer.render(object.scene, this._camera);
+            this._renderer.render(object.scene, this._camera, this._contourTextureTarget, true);
+            this._renderer.clearDepth();
+            this._contourMaterial.uniforms.uWidth.value = 1;
+              object.selected ? 5 : 1;
+            this._renderer.render(this._contourScene, this._camera);
           });
         }
       }
 
-      _onStackIndexChanged () {
-        this._updateContours();
-        this._updateClipPlane();
+      _onStackIndexChanged (index) {
+        if (this.stackHelper) {
+          this.stackHelper.index  = index;
+          this._updateContours();
+          this._updateClipPlane();
+        }
       }
 
       _updateContours() {
-        
+        if(this._contourMesh) {
+          this._contourScene.remove(this._contourMesh);
+          this._contourMesh.material.dispose();
+          this._contourMesh.material = null;
+          this._contourMesh.geometry.dispose();
+          this._contourMesh.geometry = null;
+        }
+
+        this._contourMesh = new THREE.Mesh(
+          this.stackHelper.slice.geometry, this._contourMaterial);
+        // go to LPS space
+        this._contourMesh.applyMatrix(this.stackHelper.stack._ijk2LPS);
+
+        this._contourScene.add(this._contourMesh);
       }
 
       // when index changes.
@@ -351,14 +378,14 @@
       }
 
       _stackSceneChanged(stackScene) {
-        if (stackScene === undefined
-          || !stackScene.children) {
+        if (stackScene === undefined ||
+        stackScene === null ||
+        !stackScene.children) {
           return;
         }
 
         this._scene = stackScene;
-        const stackHelper = this._scene.children[0];
-        this.set('stackHelper', stackHelper);
+        this.set('stackHelper', this._scene.children[0]);
         this.update();
       }
 
@@ -393,16 +420,7 @@
             [stack.xCosine, stack.yCosine, stack.zCosine];
           this._camera.box = box;
           this._camera.canvas = canvas;
-          this._camera.orientation = this.orientation;
-          this._camera.update();
-          this._camera.fitBox(2, 1);
-
-          this.stackHelper.orientation = this._camera.stackOrientation;
-          this.stackOrientation = this._camera.stackOrientation;
-          this.stackHelper.index = Math.floor(this.stackHelper.orientationMaxIndex/2);
-
-          this.updateInformation();
-          this.updateLabels(this._camera.directionsLabel, this.stackHelper.stack.modality);
+          this._orientationChanged(this.orientation);
         }
       }
 
@@ -425,8 +443,9 @@
           this.stackHelper.slice.canvasHeight = height;
 
           //
-          this._contourTextureTarget.width = width;
-          this._contourTextureTarget.height = height;
+          this._contourTextureTarget.setSize(width, height);
+          this._contourMaterial.uniforms.uCanvasWidth.value = width;
+          this._contourMaterial.uniforms.uCanvasHeight.value = height;
         }
       }
 
@@ -447,6 +466,10 @@
           // update stack helper orientation
           this.stackOrientation = this._camera.stackOrientation;
           this.stackHelper.orientation = this.stackOrientation;
+
+          // update index and max index
+          this.stackMaxIndex = this.stackHelper.orientationMaxIndex;
+          this.stackIndex = Math.floor(this.stackMaxIndex/2);
 
           //
           this.updateInformation();
@@ -470,6 +493,19 @@
         const orientation = this.stackHelper.orientation;
         this.sizeX = stack._dimensionsIJK.getComponent((orientation + 1) % 2);
         this.sizeY = stack._dimensionsIJK.getComponent((orientation + 2) % 2);
+      }
+
+      _onDoubleClick(event) {
+        console.log('fire');
+        const goToEvent = new CustomEvent(
+          'goto', {detail: new THREE.Vector3(
+            this.mouseI,
+            this.mouseJ,
+            this.mouseK)
+          }
+        );
+        console.log(goToEvent);
+        this.dispatchEvent(goToEvent);
       }
 
       _onScroll(event) {

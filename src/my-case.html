@@ -146,19 +146,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             id="first"
             class="viewers"
             stack-scene="[[stackScene0]]"
-            contours="[[contours]]"></ami-viewer-2d>
+            contours="[[contours]]"
+            on-goto="_handleGoto"></ami-viewer-2d>
         </div>
         <div class="small">
           <ami-viewer-2d
             id="second"
             class="viewers"
             stack-scene="[[stackScene1]]"
-            contours="[[contours]]"></ami-viewer-2d>
+            contours="[[contours]]"
+            on-goto="_handleGoto"></ami-viewer-2d>
           <ami-viewer-2d
             id="third"
             class="viewers"
             stack-scene="[[stackScene2]]"
-            contours="[[contours]]"></ami-viewer-2d>
+            contours="[[contours]]"
+            on-goto="_handleGoto"></ami-viewer-2d>
         </div>
       </div>
   </div>
@@ -190,7 +193,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             type: Array,
           },
           userCase: {
-            type: {},
+            type: Object,
             observer: '_userCaseChanged',
           },
           contour: {
@@ -271,9 +274,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           return;
         }
         if (routeData.value.page !== 'case') {
+          this._cleanup();
           return;
         }
+
         this.page = routeData.value.subpage;
+        console.log(this.page);
       }
 
       _casesChanged(cases) {
@@ -290,6 +296,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         !userCase.id) {
           return;
         }
+
+        // cleanup
+        this._cleanup();
 
         // load the models
         const loadSTLObject = (object) => {
@@ -350,11 +359,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             return firstSeries;
           })
         .then((series) => {
-
-          // cleanup previous state if needed
-          ///
-
-          //
           this.set('series', series);
           
           // create stack scenes
@@ -375,14 +379,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.set('stackScene1', stackScene1);
           this.set('stackScene2', stackScene2);
           this.$.first.orientation = 'axial';
-          this.$.first._updateClipPlane();
           this.$.first.resize();
+          this.$.first.startRenderingLoop();
           this.$.second.orientation = 'coronal';
-          this.$.second._updateClipPlane();
           this.$.second.resize();
+          this.$.second.startRenderingLoop();
           this.$.third.orientation = 'sagittal';
-          this.$.third._updateClipPlane();
           this.$.third.resize();
+          this.$.third.startRenderingLoop();
         });
 
         // fetch meshes
@@ -416,6 +420,77 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _selectionDone(contour, choice, title) {
         return !(contour !== '' && choice !== '' && title !== '');
+      }
+
+      _handleGoto(event) {
+        const ijk = event.detail;
+        const stackHelper0 = this.stackScene0.children[0];
+        const stackHelper1 = this.stackScene1.children[0];
+        const stackHelper2 = this.stackScene2.children[0];
+        this.$.first.stackIndex = ijk.getComponent((stackHelper0.orientation + 2) % 3);
+        this.$.second.stackIndex = ijk.getComponent((stackHelper1.orientation + 2) % 3);
+        this.$.third.stackIndex = ijk.getComponent((stackHelper2.orientation + 2) % 3);
+      }
+
+      _cleanup() {
+        this.userCase = {};
+        this.page = null;
+
+        // clean stack
+        if (this.stackScene0 !== null &&
+          this.stackScene0.children &&
+          this.stackScene0.children.length >= 1) {
+          let stackHelper = this.stackScene0.children[0];
+          this.stackScene0.remove(stackHelper);
+          stackHelper.dispose();
+          stackHelper = null;
+          this.stackScene0 = {};
+        }
+        this.$.first.stopRenderingLoop();
+
+        if (this.stackScene1 !== null &&
+          this.stackScene1.children &&
+          this.stackScene1.children.length >= 1) {
+          let stackHelper = this.stackScene1.children[0];
+          this.stackScene1.remove(stackHelper);
+          stackHelper.dispose();
+          stackHelper = null;
+          this.stackScene1 = {};
+        }
+        this.$.second.stopRenderingLoop();
+
+        if (this.stackScene2 !== null &&
+          this.stackScene2.children &&
+          this.stackScene2.children.length >= 1) {
+          let stackHelper = this.stackScene2.children[0];
+          this.stackScene2.remove(stackHelper);
+          stackHelper.dispose();
+          stackHelper = null;
+          this.stackScene2 = {};
+        }
+        this.$.third.stopRenderingLoop();
+
+        // clean contours
+        if (this.contours &&
+        this.contours.length > 0) {
+          for (let i=0; i<this.contours.length; i++) {
+            this.contours[i].scene.remove(this.contours[i].meshFront);
+            this.contours[i].meshFront.geometry.dispose();
+            this.contours[i].meshFront.geometry = null;
+            this.contours[i].meshFront.material.dispose();
+            this.contours[i].meshFront.material = null;
+            this.contours[i].meshFront = null;
+
+            this.contours[i].scene.remove(this.contours[i].meshBack);
+            this.contours[i].meshBack.geometry.dispose();
+            this.contours[i].meshBack.geometry = null;
+            this.contours[i].meshBack.material.dispose();
+            this.contours[i].meshBack.material = null;
+            this.contours[i].meshBack = null;
+
+            this.set('contours', []);
+          }
+        }
       }
     }
 
