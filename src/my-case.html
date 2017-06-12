@@ -145,19 +145,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <ami-viewer-2d
             id="first"
             class="viewers"
-            stack-scene="[[stackScenes.0]]"
+            stack-scene="[[stackScene0]]"
             contours="[[contours]]"></ami-viewer-2d>
         </div>
         <div class="small">
           <ami-viewer-2d
             id="second"
             class="viewers"
-            stack-scene="[[stackScenes.1]]"
+            stack-scene="[[stackScene1]]"
             contours="[[contours]]"></ami-viewer-2d>
           <ami-viewer-2d
             id="third"
             class="viewers"
-            stack-scene="[[stackScenes.2]]"
+            stack-scene="[[stackScene2]]"
             contours="[[contours]]"></ami-viewer-2d>
         </div>
       </div>
@@ -218,9 +218,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             type: Object,
             value: {},
           },
-          stackScenes: {
-            type: Array,
-            value: [],
+          stackScene0: {
+            type: Object,
+            value: {},
+          },
+          stackScene1: {
+            type: Object,
+            value: {},
+          },
+          stackScene2: {
+            type: Object,
+            value: {},
           },
           contours: {
             type: Array,
@@ -234,6 +242,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           '_routePageChanged(routeData.*)',
           '_casesChanged(cases.splices)',
         ];
+      }
+
+      constructor() {
+        super();
+        this._resizeListenerBound = this._resizeListener.bind(this);
+      }
+
+      connectedCallback() {
+        super.connectedCallback();
+        window.addEventListener('resize', this._resizeListenerBound);
+      }
+      disconnectedCallback() {
+        super.disconnectedCallback();
+        window.removeEventListener('resize', this._resizeListenerBound);
       }
 
       ready() {
@@ -269,9 +291,58 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           return;
         }
 
+        // load the models
+        const loadSTLObject = (object) => {
+          const stlLoader = new THREE.STLLoader();
+          stlLoader.load(object.location, (geometry) => {
+              object.scene = new THREE.Scene();
+
+              // front
+              object.materialFront = new THREE.MeshBasicMaterial({
+                      color: object.color,
+                      side: THREE.FrontSide,
+                      depthWrite: true,
+                      opacity: 0,
+                      transparent: true,
+                      clippingPlanes: [],
+              });
+
+              object.meshFront = new THREE.Mesh(geometry, object.materialFront);
+              // object.meshFront.applyMatrix(RASToLPS);
+              object.scene.add(object.meshFront);
+
+              // back
+              object.materialBack = new THREE.MeshBasicMaterial({
+                      color: object.color,
+                      side: THREE.BackSide,
+                      depthWrite: true,
+                      opacity: 1,
+                      transparent: true,
+                      clippingPlanes: [],
+              });
+
+              object.meshBack = new THREE.Mesh(geometry, object.materialBack);
+              // object.meshBack.applyMatrix(RASToLPS);
+              object.scene.add(object.meshBack);
+
+
+              // sceneClip.add(object.scene);
+              this.push('contours', object);
+            });
+        };
+
+        for (const model of userCase.models) {
+          const contour = {};
+          contour.color = model.color;
+          contour.label = model.label;
+          contour.location = model.location;
+          loadSTLObject(contour);
+        }
+
         // fetch new data
+        // [userCase.image]
         let loader = new AMI.default.Loaders.Volume();
-        loader.load([userCase.image])
+        loader.load([userCase.image.location])
         .then((series) => {
             // merge series
             const mergedSeries = series[0].mergeSeries(series);
@@ -279,31 +350,38 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             return firstSeries;
           })
         .then((series) => {
-          console.log(series);
+
+          // cleanup previous state if needed
+          ///
+
+          //
           this.set('series', series);
           
           // create stack scenes
           const stack = series.stack[0];
           const stackHelper0 = new AMI.default.Helpers.Stack(stack);
-          stackHelper0.orientation = 0;
           const stackScene0 = new THREE.Scene();
           stackScene0.add(stackHelper0);
 
           const stackHelper1 = new AMI.default.Helpers.Stack(stack);
-          stackHelper1.orientation = 1;
           const stackScene1 = new THREE.Scene();
           stackScene1.add(stackHelper1);
 
           const stackHelper2 = new AMI.default.Helpers.Stack(stack);
-          stackHelper2.orientation = 2;
           const stackScene2 = new THREE.Scene();
           stackScene2.add(stackHelper2);
 
-          const stackScenes = [stackScene0, stackScene1, stackScene2];
-          this.set('stackScenes', stackScenes);
-          console.log(this.stackScenes);
+          this.set('stackScene0', stackScene0);
+          this.set('stackScene1', stackScene1);
+          this.set('stackScene2', stackScene2);
+          this.$.first.orientation = 'axial';
+          this.$.first._updateClipPlane();
           this.$.first.resize();
+          this.$.second.orientation = 'coronal';
+          this.$.second._updateClipPlane();
           this.$.second.resize();
+          this.$.third.orientation = 'sagittal';
+          this.$.third._updateClipPlane();
           this.$.third.resize();
         });
 
@@ -312,6 +390,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         // _meshesChanged
         // push it to viewers
+      }
+
+      _resizeListener() {
+        this.$.first.resize();
+        this.$.second.resize();
+        this.$.third.resize();
       }
 
       _submitAnswer() {

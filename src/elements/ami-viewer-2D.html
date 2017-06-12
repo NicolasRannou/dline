@@ -134,6 +134,7 @@
           stackIndex: {
             type: Number,
             notify: true,
+            observer: '_onStackIndexChanged',
           },
           stackMaxIndex: {
             type: Number,
@@ -161,7 +162,15 @@
           },
           mouseValue: {
             type: Number,
-          }
+          },
+          contours: {
+            type: Array,
+            value: [],
+          },
+          clipPlane: {
+            type: Object,
+            value: {},
+          },
         };
       }
 
@@ -189,6 +198,7 @@
         this._clipPlane = null;
         this.stackHelper = null;
         this.orientation = 'default';
+        this.clipPlane = new THREE.Plane(new THREE.Vector3(0, 0, 0), 0);
 
         this._initScene();
         this._initCamera();
@@ -249,9 +259,48 @@
         this._controls.update();
         this._renderer.clear();
 
-        this._mesh.rotation.x += 0.01;
-        this._mesh.rotation.y += 0.02;
+        // this._mesh.rotation.x += 0.01;
+        // this._mesh.rotation.y += 0.02;
         this._renderer.render( this._scene, this._camera );
+        this._renderer.clearDepth();
+
+        if (this.contours.length >= 1 && this.stackHelper) {
+          this.contours.forEach((object, key) => {
+            object.materialFront.clippingPlanes = [this.clipPlane];
+            object.materialBack.clippingPlanes = [this.clipPlane];
+            // this.renderer.render(object, camera, contourTextureTarget, true);
+            // renderer.clearDepth();
+            // contourMaterial.uniforms.uWidth.value = 1;
+            //   object.selected ? 5 : 1;
+            this._renderer.render(object.scene, this._camera);
+          });
+        }
+      }
+
+      _onStackIndexChanged () {
+        this._updateClipPlane();
+      }
+
+      // when index changes.
+      _updateClipPlane() {
+        const stackHelper = this.stackHelper;
+        const camera = this._camera;
+        let vertices = stackHelper.slice.geometry.vertices;
+        let p1 = new THREE.Vector3(vertices[0].x, vertices[0].y, vertices[0].z)
+          .applyMatrix4(stackHelper._stack.ijk2LPS);
+        let p2 = new THREE.Vector3(vertices[1].x, vertices[1].y, vertices[1].z)
+          .applyMatrix4(stackHelper._stack.ijk2LPS);
+        let p3 = new THREE.Vector3(vertices[2].x, vertices[2].y, vertices[2].z)
+          .applyMatrix4(stackHelper._stack.ijk2LPS);
+
+        this.clipPlane.setFromCoplanarPoints(p1, p2, p3);
+
+        let cameraDirection = new THREE.Vector3(1, 1, 1);
+        cameraDirection.applyQuaternion(camera.quaternion);
+
+        if (cameraDirection.dot(this.clipPlane.normal) > 0) {
+          this.clipPlane.negate();
+        }
       }
 
       _stackSceneChanged(stackScene) {
@@ -336,11 +385,15 @@
 
         if (this.stackHelper &&
         this.stackHelper.stack) {
+
+          // update camera orientation
           this._camera.orientation = orientation;
           this._camera.update();
           this._camera.fitBox(2, 1);
 
+          // update stack helper orientation
           this.stackOrientation = this._camera.stackOrientation;
+          this.stackHelper.orientation = this.stackOrientation;
 
           //
           this.updateInformation();
