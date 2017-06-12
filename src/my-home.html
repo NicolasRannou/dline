@@ -1,4 +1,5 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/polymer/lib/elements/dom-if.html">
 <link rel="import" href="../bower_components/polymer/lib/elements/dom-repeat.html">
 <link rel="import" href="../bower_components/polymer/lib/mixins/gesture-event-listeners.html">
 
@@ -15,6 +16,8 @@
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
 
 <link rel="import" href="../bower_components/polymerfire/firebase-auth.html">
 <link rel="import" href="../bower_components/polymerfire/firebase-query.html">
@@ -84,54 +87,68 @@
       margin-left: 10px;
     }
 
-      paper-card{
-        --paper-card-header-image:{
-              -moz-transition: all 0.3s;
-  -webkit-transition: all 0.3s;
-  transition: all 0.3s;
-           height: 256px;
-           width: 400px;
-           object-fit: cover;
-                      -webkit-filter: sepia(.5);
-  filter: sepia(.5);
-        };
-      }
+    paper-card {
+      --paper-card-header-image:{
+        -moz-transition: all 0.1s;
+        -webkit-transition: all 0.1s;
+        transition: all 0.1s;
+        height: 256px;
+        width: 400px;
+        object-fit: cover;
+        -webkit-filter: grayscale(.7);
+        filter: grayscale(.7);
+      };
+    }
 
-            paper-card:hover{
-        --paper-card-header-image:{
-                     height: 256px;
-           width: 400px;
-           object-fit: cover;
-           -webkit-filter: none;
-  filter: none;
-    -moz-transition: all 0.3s;
-  -webkit-transition: all 0.3s;
-  transition: all 0.3s;
-  -moz-transform: scale(1.1);
-  -webkit-transform: scale(1.1);
-  transform: scale(1.1);
-        };
-      }
+    paper-card:hover{
+      --paper-card-header-image:{
+        height: 256px;
+        width: 400px;
+        object-fit: cover;
+        -webkit-filter: none;
+        filter: none;
+        -moz-transition: all 0.1s;
+        -webkit-transition: all 0.1s;
+        transition: all 0.1s;
+        -moz-transform: scale(1.05);
+        -webkit-transform: scale(1.05);
+        transform: scale(1.05);
+      };
+    }
 
-    	@media (max-width: 400px) {
-        paper-card {
-		width: 100%;
-        }
-	}
-  .cafe-header { @apply --paper-font-headline; }
-  .cafe-light { color: var(--paper-grey-600); }
-  .cafe-location {
-    float: right;
-    font-size: 15px;
-    vertical-align: middle;
-  }
-  .cafe-reserve { color: var(--google-blue-500); }
-  iron-icon.star {
-    --iron-icon-width: 16px;
-    --iron-icon-height: 16px;
-    color: var(--paper-amber-500);
-  }
-  iron-icon.star:last-of-type { color: var(--paper-grey-500); }
+    @media (max-width: 400px) {
+      paper-card {
+		    width: 100%;
+      }
+	  }
+
+    .cafe-header {
+      @apply --paper-font-headline;
+    }
+
+    .cafe-light {
+      color: var(--paper-grey-600);
+    }
+
+    .cafe-location {
+      float: right;
+      font-size: 15px;
+      vertical-align: middle;
+    }
+
+    .cafe-reserve {
+      color: var(--google-blue-500);
+    }
+
+    iron-icon.star {
+      --iron-icon-width: 16px;
+      --iron-icon-height: 16px;
+      color: var(--paper-amber-500);
+    }
+
+    iron-icon[icon="star-border"]{
+      color: var(--paper-grey-500);
+    }
 
     </style>
 
@@ -139,22 +156,33 @@
       id="FBAuth"
       user="{{user}}">
     </firebase-auth>
+
     <firebase-query
       id="FBQuery"
       path="/cases"
       data="{{userCases}}">
     </firebase-query>
 
+    <firebase-query
+      id="FBSave"
+      path="/users/[[user.uid]]/cases"
+      data="{{casesDone}}">
+    </firebase-query>
+
     <app-drawer-layout fullbleed>
       <!-- Drawer content -->
       <app-drawer id="drawer" slot="drawer">
         <app-toolbar>Menu</app-toolbar>
-        Logged in as {{user.email}}
-        <template is="dom-repeat" items="{{tags}}" as="tag">
-          <div>
-            [[tag]]
-          </div>
-        </template>
+        Welcome, {{user.email}}
+        <paper-listbox selected="{{filter}}" attr-for-selected="label">
+          <paper-item label="all">All cases ([[allCases.length]])</paper-item>
+          <paper-item label="completed">Completed ([[completed]])</paper-item>
+          <paper-item label="todo">To do ([[todo]])</paper-item>
+          <template is="dom-repeat" items="{{tags}}" as="tag">
+            <paper-item label$="[[tag.value]]">[[tag.value]] ([[tag.count]])</paper-item>
+          </template>
+          </paper-listbox>
+
       </app-drawer>
 
       <!-- Main content -->
@@ -168,37 +196,46 @@
           </app-toolbar>
         </app-header>
 
-<div class="container">
-       <template is="dom-repeat" items="{{userCases}}" as="case">
-         <!--<li>[[case.title]]</li>-->
-         <paper-card image="[[case.cover]]">
-  <div class="card-content">
-    <div class="cafe-header">[[case.title]]
-      <div class="cafe-location cafe-light">
-        <iron-icon icon="communication:location-on"></iron-icon>
-        <span>Status (done/or not)</span>
-      </div>
-    </div>
-    <div class="cafe-rating">
-      <!-- tags -->
-      <iron-icon class="star" icon="star"></iron-icon>
-      <iron-icon class="star" icon="star"></iron-icon>
-      <iron-icon class="star" icon="star"></iron-icon>
-      <iron-icon class="star" icon="star"></iron-icon>
-      <iron-icon class="star" icon="star"></iron-icon>
-    </div>
-    <p>Author・[[case.author]]</p>
-    <p class="cafe-light">[[case.description]]</p>
-  </div>
-  <div class="card-actions">
-    <div class="horizontal justified">
-      <a name="view3" href="/case/[[case.id]]"><paper-button class="cafe-reserve">Case</paper-button></a>
-      <a name="view3" href="/contouring/[[case.id]]"><paper-button class="cafe-reserve">Contouring</paper-button></a>    
-    </div>
-  </div>
-</paper-card>
-       </template>
-</div>
+        <div class="container">
+
+          <template is="dom-repeat" items="{{allCases}}" as="mycase" filter="{{_filterCases(filter)}}">
+
+            <paper-card image="[[mycase.cover]]">
+              <div class="card-content">
+                <div class="cafe-header">[[mycase.title]]
+                  <div class="cafe-location cafe-light">
+                    <template is="dom-if" if="{{mycase.completed}}">
+                      <iron-icon icon="icons:done"></iron-icon>
+                      <span>Completed</span>
+                    </template>
+                    <template is="dom-if" if="{{!mycase.completed}}">
+                      <iron-icon icon="icons:clear"></iron-icon>
+                      <span>Not done</span>
+                    </template>
+                  </div>
+                </div>
+                <div class="cafe-rating">
+                  <!-- tags -->
+                  <iron-icon class="star" icon$="{{_fillStar(1, mycase.difficulty)}}"></iron-icon>
+                  <iron-icon class="star" icon$="{{_fillStar(2, mycase.difficulty)}}"></iron-icon>
+                  <iron-icon class="star" icon$="{{_fillStar(3, mycase.difficulty)}}"></iron-icon>
+                  <iron-icon class="star" icon$="{{_fillStar(4, mycase.difficulty)}}"></iron-icon>
+                  <iron-icon class="star" icon$="{{_fillStar(5, mycase.difficulty)}}"></iron-icon>
+                </div>
+                <p>Author・[[mycase.author]]</p>
+                <p class="cafe-light">[[mycase.description]]</p>
+              </div>
+              <div class="card-actions">
+                <div class="horizontal justified">
+                  <a name="view3" href="/case/[[mycase.id]]"><paper-button class="cafe-reserve">Case</paper-button></a>
+                  <paper-button class="cafe-reserve" disabled>Contouring</paper-button> 
+                </div>
+              </div>
+            </paper-card>
+
+          </template>
+
+        </div>
       </app-header-layout>
     </app-drawer-layout>
   </template>
@@ -226,12 +263,32 @@
             type: Array,
             value: [],
           },
+          allCases: {
+            type: Array,
+            value: [],
+          },
+          completed: {
+            type: Number,
+            computed: '_computeCompleted(allCases)'
+          },
+          todo: {
+            type: Number,
+            computed: '_computeTodo(allCases)'
+          },
+          casesDone: {
+            type: Array,
+          },
+          filter: {
+            type: String,
+            value: 'all',
+          },
         };
       }
 
       static get observers() {
         return [
           '_userCasesChanged(userCases.splices)',
+          '_casesDoneChanged(casesDone.splices)',
         ];
       }
 
@@ -244,23 +301,84 @@
           return;
         }
         
-        const tagSet = new Set();
+        const tagSet = {};
         const object = userCases.indexSplices[0].object;
         for (const singlecase of object) {
           const tagList = singlecase.tags;
           for (const tag of tagList) {
-            tagSet.add(tag);
+            if (tagSet[tag]) {
+              tagSet[tag] += 1;
+            } else {
+              tagSet[tag] = 1;
+            }
           }
         }
 
-        this.set('tags', Array.from(tagSet));
-        console.log(this.tags);
+        const tagArray = [];
+        for (const value in tagSet) {
+          tagArray.push({
+            value: value,
+            count: tagSet[value],
+          });
+        }
+
+        this.set('tags', tagArray);
+        this.set('allCases', userCases.indexSplices[0].object);
+      }
+
+      _casesDoneChanged(casesDone) {
+        if (casesDone === undefined) {
+          return;
+        }
+        const index = casesDone.indexSplices[0].index;
+        const object = casesDone.indexSplices[0].object;
+        const newCase = object[index];
+
+        for (let i=0; i<this.allCases.length; i++) {
+          if (newCase.id === this.allCases[i].id){
+           this.set(['allCases', i, 'completed'], true);
+           this.allCases = this.allCases.slice();
+          }
+
+        }
       }
 
       _handleLogout() {
-        console.log('out...');
-        console.log(this.$.FBAuth);
         this.$.FBAuth.signOut();
+      }
+
+      _fillStar(starIndex, difficulty) {
+        return (starIndex <= difficulty) ? 'star' : 'star-border';
+      }
+
+      _filterCases(filter) {
+        if(filter === 'all') {
+          return function(mycase) {
+            return true;
+          };
+        } else if (filter === 'completed') {
+          return function(mycase) {
+            return mycase.completed;
+          };
+        } else if (filter === 'todo') {
+          return function(mycase) {
+            return !mycase.completed;
+          };
+        } else {
+          return function(mycase) {
+            return mycase.tags.indexOf(filter) != -1;
+          };
+        }
+      }
+
+      _computeCompleted(cases) {
+        const completed = cases.filter((acase) => acase.completed);
+        return completed.length;
+      }
+
+      _computeTodo(cases) {
+        const todo = cases.filter((acase) => !acase.completed);
+        return todo.length;
       }
     }
 

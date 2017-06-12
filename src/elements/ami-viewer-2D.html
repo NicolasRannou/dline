@@ -78,20 +78,20 @@
       <div id="left" class="left direction"></div>
       <div id="right" class="right direction"></div>
 
-      <div id="topLeft" class="top left information">
+      <div id="topLeft" class="top left information" hidden$="[[!showInformation]]">
         <div>Image Size: [[sizeX]] x [[sizeY]]</div>
         <div>WW: [[stackWindowWidth]] WL: [[stackWindowCenter]]</div>
         <div>I: [[mouseI]] J: [[mouseJ]] K: [[mouseK]] Value: [[mouseValue]]</div>
       </div>
-      <div id="topRight" class="top right information">
+      <div id="topRight" class="top right information" hidden$="[[!showInformation]]">
         <div>Patient ID</div>
         <div>Study Description</div>
         <div>Series Description</div>
       </div>
-      <div id="bottomLeft" class="bottom left information">
+      <div id="bottomLeft" class="bottom left information" hidden$="[[!showInformation]]">
         <div>Im: [[stackIndex]]/[[stackMaxIndex]]</div>
       </div>
-      <div id="bottomRight" class="bottom right information">
+      <div id="bottomRight" class="bottom right information" hidden$="[[!showInformation]]">
         <div>Study Date: March 12, 2016</div>
       </div>
     </div>
@@ -108,6 +108,10 @@
       }
       static get properties() {
         return {
+          showInformation: {
+            type:Boolean,
+            value: false,
+          },
           animationFrameID: {
             type: Number,
             value: -1,
@@ -171,6 +175,11 @@
             type: Object,
             value: {},
           },
+          localizers: {
+            type: Array,
+            value: [],
+            observer: '_localizersChanged',
+          },
         };
       }
 
@@ -205,6 +214,7 @@
         this._initCamera();
         this._initControls();
         this._initRenderer();
+        this._initLocalizers();
         this._initContours();
 
         // attach event listeners
@@ -255,6 +265,11 @@
         this._container.appendChild( this._renderer.domElement );
       }
 
+      _initLocalizers() {
+        this.localizerHelper = null;
+        this.localizerScene = new THREE.Scene();
+      }
+
       _initContours() {
         this.clipPlane = new THREE.Plane(new THREE.Vector3(0, 0, 0), 0);
 
@@ -298,15 +313,14 @@
       }
 
       startRenderingLoop() {
-        console.log('start rendering');
         this._animate();
       }
 
       stopRenderingLoop() {
-        console.log('stop rendering');
         window.cancelAnimationFrame(this.animationFrameID);
         this.animationFrameID = undefined;
       }
+
       _animate() {
         this.animationFrameID = requestAnimationFrame(() => {this._animate()} );
         this._controls.update();
@@ -317,17 +331,21 @@
         this._renderer.render( this._scene, this._camera );
         this._renderer.clearDepth();
 
+        // contours
         if (this.contours.length >= 1 && this.stackHelper) {
           this.contours.forEach((object, key) => {
             object.materialFront.clippingPlanes = [this.clipPlane];
             object.materialBack.clippingPlanes = [this.clipPlane];
             this._renderer.render(object.scene, this._camera, this._contourTextureTarget, true);
             this._renderer.clearDepth();
-            this._contourMaterial.uniforms.uWidth.value = 1;
-              object.selected ? 5 : 1;
+            this._contourMaterial.uniforms.uWidth.value = object.selected ? 5 : 1;
             this._renderer.render(this._contourScene, this._camera);
           });
         }
+
+        // localizers
+        this._renderer.clearDepth();
+        this._renderer.render(this.localizerScene, this._camera);
       }
 
       _onStackIndexChanged (index) {
@@ -335,7 +353,42 @@
           this.stackHelper.index  = index;
           this._updateContours();
           this._updateClipPlane();
+          this._updateLocalizer();
         }
+      }
+
+      _localizersChanged(localizers) {
+        if (localizers === undefined ||
+        localizers.length === 0 ||
+        this.localizerHelper === null) {
+          return;
+        }
+
+        for (let i = 0; i < localizers.length; i++) {
+          this.localizerHelper['plane' + (i + 1)] = localizers[i].plane;
+          this.localizerHelper['color' + (i + 1)] = localizers[i].color;
+        }
+      }
+
+      _updateLocalizer() {
+        if (this.localizerHelper === null) {
+          const stack = this.stackHelper.stack;
+          const slice = this.stackHelper.slice;
+          const referencePlane = slice.cartesianEquation();
+
+          this.localizerHelper = new AMI.default.Helpers.Localizer(
+            stack, slice.geometry, referencePlane);
+
+          this.localizerHelper.canvasWidth =
+            this._container.clientWidth;
+          this.localizerHelper.canvasHeight =
+            this._container.clientHeight;
+
+          this.localizerScene.add(this.localizerHelper);
+        }
+
+        this.localizerHelper.referencePlane = this.stackHelper.slice.cartesianEquation();
+        this.localizerHelper.geometry = this.stackHelper.slice.geometry;
       }
 
       _updateContours() {
@@ -446,6 +499,10 @@
           this._contourTextureTarget.setSize(width, height);
           this._contourMaterial.uniforms.uCanvasWidth.value = width;
           this._contourMaterial.uniforms.uCanvasHeight.value = height;
+
+          //
+          this.localizerHelper.canvasWidth = width;
+          this.localizerHelper.canvasHeight = height;
         }
       }
 
@@ -496,7 +553,6 @@
       }
 
       _onDoubleClick(event) {
-        console.log('fire');
         const goToEvent = new CustomEvent(
           'goto', {detail: new THREE.Vector3(
             this.mouseI,
@@ -504,7 +560,6 @@
             this.mouseK)
           }
         );
-        console.log(goToEvent);
         this.dispatchEvent(goToEvent);
       }
 
