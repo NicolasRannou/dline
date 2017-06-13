@@ -16,16 +16,48 @@
   <template>
     <style>
       :host {
-        --dark-primary-color:       #546e7a;
-        --default-primary-color:    #607d8b;
-        --light-primary-color:      #b0bec5;
+        --dark-primary-color:       #455A64;
+        --default-primary-color:    #607D8B;
+        --light-primary-color:      #CFD8DC;
         --text-primary-color:       #FFFFFF;
         --accent-color:             #FF4081;
-        --primary-background-color: #BBDEFB;
+        --primary-background-color: #CFD8DC;
         --primary-text-color:       #212121;
         --secondary-text-color:     #757575;
         --disabled-text-color:      #BDBDBD;
         --divider-color:            #BDBDBD;
+
+
+        /* Components */
+
+        /* paper-drawer-panel */
+        --drawer-menu-color:           #ffffff;
+        --drawer-border-color:         1px solid #ccc;
+        --drawer-toolbar-border-color: 1px solid rgba(0, 0, 0, 0.22);
+
+        /* paper-menu */
+        --paper-menu-background-color: #fff;
+        --menu-link-color:             #111111;
+
+        /* paper-input */
+        --paper-input-container-color:       #607D8B;
+        --paper-input-container-focus-color: #455A64;
+        --paper-input-container-input-color: #212121;
+
+        /* paper-tabs */
+        --paper-tab-ink: var(--accent-color);
+        --paper-tabs-selection-bar-color: var(--accent-color);
+
+        /* paper-button */
+        --paper-button:{
+          background-color: var(--accent-color);
+          color: var(--text-primary-color);
+        }
+
+        /* paper-item */
+        --paper-listbox: {
+          background: #fff;
+        }
 
         display: block;
       }

@@ -40,8 +40,8 @@
       }
 
       app-header {
-        color: #fff;
-        background-color: var(--default-primary-color);
+        background-color: var(--dark-primary-color);
+        color: var(--text-primary-color);
       }
 
       app-header paper-icon-button {
@@ -150,6 +150,44 @@
       color: var(--paper-grey-500);
     }
 
+    .drawerHeader {
+      color: #fff;
+      background-size: cover;
+      background-position: center center;
+      background-repeat: no-repeat;
+      background-image: url('/image.png');
+    }
+
+    .welcome {
+      min-height: 128px;
+      background-size: cover;
+      background-position: center center;
+      background-repeat: no-repeat;
+      background-image: url('/image.png');
+      margin-bottom: 16px;
+    }
+
+    .email {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      font-size: 18px;
+      font-weight: lighter;
+    }
+
+    /*.tags {
+      height: 100%;
+      overflow-y: auto;
+    }*/
+
+    .separator {
+      padding: 16px;
+      font-size: 14px;
+      font-weight: lighter;
+      color: #aaa;
+      border-top: 1px solid var(--divider-color);
+    }
+
     </style>
 
     <firebase-auth
@@ -172,16 +210,21 @@
     <app-drawer-layout fullbleed>
       <!-- Drawer content -->
       <app-drawer id="drawer" slot="drawer">
-        <app-toolbar>Menu</app-toolbar>
-        Welcome, {{user.email}}
-        <paper-listbox selected="{{filter}}" attr-for-selected="label">
-          <paper-item label="all">All cases ([[allCases.length]])</paper-item>
-          <paper-item label="completed">Completed ([[completed]])</paper-item>
-          <paper-item label="todo">To do ([[todo]])</paper-item>
-          <template is="dom-repeat" items="{{tags}}" as="tag">
-            <paper-item label$="[[tag.value]]">[[tag.value]] ([[tag.count]])</paper-item>
-          </template>
+        <div style="height: 100%; overflow: auto;">
+        <div class="welcome"></div>
+        <div class="tags">
+          <paper-listbox selected="{{filter}}" attr-for-selected="label" selectable=".label">
+            <div class="separator">Filter</div>
+            <paper-item label="all" class="label">All cases ([[allCases.length]])</paper-item>
+            <paper-item label="completed" class="label">Completed ([[completed]])</paper-item>
+            <paper-item label="todo" class="label">To do ([[todo]])</paper-item>
+            <div class="separator">All labels</div>
+            <template is="dom-repeat" items="{{tags}}" as="tag">
+              <paper-item label$="[[tag.value]]" class="label">[[tag.value]] ([[tag.count]])</paper-item>
+            </template>
           </paper-listbox>
+        </div>
+        </div>
 
       </app-drawer>
 
@@ -191,8 +234,10 @@
         <app-header slot="header" condenses reveals effects="waterfall">
           <app-toolbar>
             <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
-            <div main-title>DLine</div>
-            <paper-button on-tap="_handleLogout">Logout</paper-button>
+            <div main-title>DLINE - Contouring Atlases</div>
+                    <div class="email">
+          <div>{{user.email}}</div><paper-icon-button icon="icons:exit-to-app" on-tap="_handleLogout"></paper-icon-button>
+        </div>
           </app-toolbar>
         </app-header>
 

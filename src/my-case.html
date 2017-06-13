@@ -96,65 +96,65 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </firebase-query>
 
 
-<app-header-layout fullbleed>
-  <app-header slot="header" fixed condenses effects="waterfall">
-    <app-toolbar>
-      <div main-title>[[userCase.id]]</div>
-      <a name="view3" href="/home/"><paper-icon-button icon="my-icons:close"></paper-icon-button></a>
-    </app-toolbar>
-  </app-header>
-  <div class="content">
-      <div class="answer">
-        <div>Best contour:</div>
-        <paper-radio-group selected="{{contour}}">
-          <paper-radio-button name="red">red</paper-radio-button>
-          <paper-radio-button name="green">green</paper-radio-button>
-          <paper-radio-button name="blue">blue</paper-radio-button>
-          <paper-radio-button name="none">none</paper-radio-button>
-        </paper-radio-group>
-        <div>Choice was:</div>
-        <paper-radio-group selected="{{choice}}">
-          <paper-radio-button name="easy">easy</paper-radio-button>
-          <paper-radio-button name="average">average</paper-radio-button>
-          <paper-radio-button name="hard">hard</paper-radio-button>
-          <paper-radio-button name="veryhard">very hard</paper-radio-button>
-        </paper-radio-group>
-        <paper-button
-          on-tap="_submitAnswer"
-          disabled$="[[_selectionDone(contour, choice)]]">
-          Submit answer
-        </paper-button>
+    <app-header-layout fullbleed>
+      <app-header slot="header" fixed condenses effects="waterfall">
+        <app-toolbar>
+          <div main-title>[[userCase.id]]</div>
+          <a name="view3" href="/home/"><paper-icon-button icon="my-icons:close"></paper-icon-button></a>
+        </app-toolbar>
+      </app-header>
+      <div class="content">
+          <div class="answer">
+            <div>Best contour:</div>
+            <paper-radio-group selected="{{contour}}">
+              <paper-radio-button name="red">red</paper-radio-button>
+              <paper-radio-button name="green">green</paper-radio-button>
+              <paper-radio-button name="blue">blue</paper-radio-button>
+              <paper-radio-button name="none">none</paper-radio-button>
+            </paper-radio-group>
+            <div>Choice was:</div>
+            <paper-radio-group selected="{{choice}}">
+              <paper-radio-button name="easy">easy</paper-radio-button>
+              <paper-radio-button name="average">average</paper-radio-button>
+              <paper-radio-button name="hard">hard</paper-radio-button>
+              <paper-radio-button name="veryhard">very hard</paper-radio-button>
+            </paper-radio-group>
+            <paper-button
+              on-tap="_submitAnswer"
+              disabled$="[[_selectionDone(contour, choice)]]">
+              Submit answer
+            </paper-button>
+          </div>
+          <div class="viewers">
+            <div class="main">
+              <ami-viewer-2d
+                id="first"
+                class="viewers"
+                show-information
+                stack-index="{{stackIndex0}}"
+                stack-scene="[[stackScene0]]"
+                contours="[[contours]]"
+                on-goto="_handleGoto"></ami-viewer-2d>
+            </div>
+            <div class="small">
+              <ami-viewer-2d
+                id="second"
+                class="viewers"
+                stack-index="{{stackIndex1}}"
+                stack-scene="[[stackScene1]]"
+                contours="[[contours]]"
+                on-goto="_handleGoto"></ami-viewer-2d>
+              <ami-viewer-2d
+                id="third"
+                class="viewers"
+                stack-index="{{stackIndex2}}"
+                stack-scene="[[stackScene2]]"
+                contours="[[contours]]"
+                on-goto="_handleGoto"></ami-viewer-2d>
+            </div>
+          </div>
       </div>
-      <div class="viewers">
-        <div class="main">
-          <ami-viewer-2d
-            id="first"
-            class="viewers"
-            show-information
-            stack-index="{{stackIndex0}}"
-            stack-scene="[[stackScene0]]"
-            contours="[[contours]]"
-            on-goto="_handleGoto"></ami-viewer-2d>
-        </div>
-        <div class="small">
-          <ami-viewer-2d
-            id="second"
-            class="viewers"
-            stack-index="{{stackIndex1}}"
-            stack-scene="[[stackScene1]]"
-            contours="[[contours]]"
-            on-goto="_handleGoto"></ami-viewer-2d>
-          <ami-viewer-2d
-            id="third"
-            class="viewers"
-            stack-index="{{stackIndex2}}"
-            stack-scene="[[stackScene2]]"
-            contours="[[contours]]"
-            on-goto="_handleGoto"></ami-viewer-2d>
-        </div>
-      </div>
-  </div>
-</app-header-layout>
+    </app-header-layout>
 
   </template>
 

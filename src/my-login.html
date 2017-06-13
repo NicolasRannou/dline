@@ -3,6 +3,10 @@
 
 <link rel="import" href="../bower_components/neon-animation/web-animations.html">
 
+<link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
+
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
@@ -23,77 +27,60 @@
 <dom-module id="my-login">
   <template>
     <style include="shared-styles">
-    :host {
-      display: flex;
-      position: absolute;
-      top: 0;
-      right: 0;
-      left: 0;
-      bottom: 0;
-      background-color: var(--dark-primary-color);
-    }
+      :host {
+        display: block;
+      }
 
-    .container{
-      max-width: 800px;
-      margin: auto;
-      margin-top: 60px;
-      margin-bottom: 60px;
-      position: relative;
-      display:flex;
-      flex-direction:column;
-      align-items: center;
-      justify-content: center;
-    }
+      .content {
+        display: flex;
+        height: 100%;
+        background-color: var(--default-primary-color);
+        align-items: center;
+        justify-content: center;
+      }
 
-    firebase-auth{
-      display: none;
-    }
+      .message{
+        color: grey;
+        text-decoration: none;
+        font-size: 12px;
+        font-style: italic;
+        font-weight: lighter;
+      }
 
-    #reset{
-      color: grey;
-      text-decoration: none;
-      font-size: 12px;
-      font-style: italic;
-      font-weight: lighter;
-    }
+      .clickable:hover{
+        color: grey;
+        text-decoration: underline;
+      }
 
-    #reset:hover{
-      color: grey;
-      text-decoration: underline;
-    }
+      .card {
+        width: 256px;
+      }
 
-    #emailPWError {
-      color: var(--error-color);
-      text-align: center;
-      font-size: 16px;
-      font-weight: 500;
-      line-height: 24px;
-      margin: 0;
-      padding: 0;
-    }
+      iron-pages > div {
+        display: flex;
+        flex-direction: column;
+      }
 
-    #emailPWMessage {
-      color: var(--primary-color);
-      text-align: center;
-      font-size: 16px;
-      font-weight: 500;
-      line-height: 24px;
-      margin: 0;
-      padding: 0;
-    }
+      iron-pages > div > * {
+        margin-left: auto;
+        margin-right: auto;
+        min-width: 200px;
+      }
 
-    form{
-      min-width: 200px;
-      margin: 0 auto;
-    }
+      .title {
+        padding: 30px 10px 0px;
+        text-align: center;
+        font-size: 20px;
+      }
 
-    .card {
-      width: 356px;
-    }
+      paper-button {
+        margin-top: 20px;
+      }
 
-    paper-dropdown-menu {
-      width: 100%;
-    }
+      app-header {
+        background-color: var(--dark-primary-color);
+        color: var(--text-primary-color);
+      }
     </style>
 
     <firebase-auth
@@ -108,7 +95,15 @@
       path="/users/[[user.uid]]/preferences">
     </firebase-query>
 
-    <div class="container">
+    <app-header-layout fullbleed>
+      <app-header slot="header" fixed condenses effects="waterfall">
+        <app-toolbar>
+          <div main-title>DLINE - Contouring Atlases</div>
+        </app-toolbar>
+      </app-header>
+      <div class="content">
+
+    <!--<div class="container">-->
       <div class="card">
 
         <paper-tabs selected="{{selected}}">
@@ -118,7 +113,7 @@
 
         <iron-pages selected="{{selected}}">
           <div>
-            <div>Create an account</div>
+            <div class="title">Create an account</div>
             <paper-input
               id="signupEmail"
               type="email"
@@ -133,16 +128,14 @@
               minlength="6"
               char-counter
               label="Password"
-              error-message="Password must be at lest 6 characters" required></paper-input>
+              error-message="Must be at lest 6 characters" required></paper-input>
             <paper-input
               id="signupPasswordConfirm"
               type="password"
               value="{{passwordMatch}}"
-              minlength="6"
-              char-counter
               type="password"
               label="Confirm Password"
-              error-message="Password do not match"
+              error-message="Do not match password"
               required></paper-input>
             <paper-dropdown-menu
               id="signupTitle"
@@ -157,35 +150,35 @@
               </paper-listbox>
             </paper-dropdown-menu>
             <paper-button type="submit" on-tap="_signUp">Sign Up</paper-button>
-            <p hidden$="[[!forgotPassword]]"><a href="#" id="reset" on-click="_resetPW">Email already used. Email new password?</a></p>
+            <p hidden$="[[!forgotPassword]]" class="message">Email already registered.</p>
           </div>
           <div>
-            <div>Log into you account</div>
-            <form on-submit="_signInEmailPW">
-              <paper-input
-                id="signinEmail"
-                type="email"
-                label="Email"
-                value="{{email}}"
-                validator="email-validator"
-                error-message="Invalid email address" required auto-validate></paper-input>
-              <paper-input
-                id="signinPassword"
-                type="password"
-                value="{{password}}"
-                minlength="6"
-                char-counter
-                label="Password"
-                error-message="Invalid password" required></paper-input>
-              <paper-button type="submit" on-tap="_signIn">Sign In</paper-button>
-              <p hidden$="[[!forgotPassword]]"><a href="#" id="reset" on-click="_resetPW">Incorrect password. Email new password?</a></p>
-              <p hidden$="[[!forgotEmail]]"><a href="#" id="reset" on-click="_gotoSignUp">Unkown email. Create account?</a></p>
-              [[this.message]]
-            </form>
+            <div class="title">Log into your account</div>
+            <paper-input
+              id="signinEmail"
+              type="email"
+              label="Email"
+              value="{{email}}"
+              validator="email-validator"
+              error-message="Invalid email address" required auto-validate></paper-input>
+            <paper-input
+              id="signinPassword"
+              type="password"
+              value="{{password}}"
+              label="Password"
+              on-keydown="_passwordKeyDown"
+              error-message="Invalid password" required></paper-input>
+            <paper-button on-tap="_signIn">Sign In</paper-button>
+            <p hidden$="[[!forgotPassword]]"><a href="#" class="clickable message" on-click="_resetPassword">Incorrect password. Email new password?</a></p>
+            <p hidden$="[[!forgotEmail]]"><a href="#" class="clickable message" on-click="_gotoSignUp">Unkown email. Create account?</a></p>
+            [[this.message]]
           </div>
         </iron-pages>
       </div>
-    </div>
+    <!--</div>-->
+
+          </div>
+    </app-header-layout>
 
   </template>
 
@@ -195,14 +188,9 @@
 
       static get properties() {
         return {
-          /**
-          * `user` represents the user object returned by the firebase-auth element
-          */
           user: {
             type: Object,
             value: {},
-            notify: true,
-            reflectToAttribute: true,
             observer: '_userChanged',
           },
           selected: {
@@ -211,15 +199,13 @@
           },
           email: {
             type: String,
-            value: '',
           },
           password: {
             type: String,
-            value: '',
+            observer: '_passwordChanged',
           },
           passwordMatch: {
             type: String,
-            value: '',
             observer: '_passwordMismatch',
           },
           message: {
@@ -240,19 +226,11 @@
           },
           newTitle: {
             type: String,
-            value: '',
           },
         };
       }
 
-      _cleanMessages() {
-        this.$.emailPWError.textContent = '';
-        this.$.emailPWMessage.textContent = '';
-      }
-
       _signIn(e) {
-        // this._cleanMessages();
-
         // validate
         const validEmail = this.$.signinEmail.validate();
         const validPassword = this.$.signinPassword.validate();
@@ -275,45 +253,42 @@
           validTitle) {
 
           // sign up and sign in!
-          this.$.FBAuth.createUserWithEmailAndPassword(this.email, this.password)
-          .then((response) => {
-            this.newTitle = this.title;
-          });
+          this.newTitle = this.title;
+          this.$.FBAuth.createUserWithEmailAndPassword(this.email, this.password);
         }
       }
 
       _handleEmailPWError(err) {
         if(err.detail.code === "auth/wrong-password"){
+          // sign in with wrong password
           this.$.signinPassword.invalid = true;
-          this.password = '';
-          this.passwordMatch = '';
           this.forgotPassword = true;
           this.forgotEmail = false;
         } else if(err.detail.code === "auth/user-not-found") {
+          // sign in with wrong email
           this.$.signinEmail.invalid = true;
-          this.password = '';
-          this.passwordMatch = '';
           this.forgotPassword = false;
           this.forgotEmail = true;
         } else if(err.detail.code === "auth/email-already-in-use") {
+          // sign up with wrong email
+          this.newTitle = undefined;
           this.$.signupPassword.invalid = true;
-          this.password = '';
-          this.passwordMatch = '';
           this.forgotPassword = true;
           this.forgotEmail = false;
         } else {
-          this.email = '';
-          this.password = '';
-          this.passwordMatch = '';
-          this.selected = '';
+          this.email = null;
+          this.selected = 1;
           this.forgotPassword = false;
           this.forgotEmail = false;
         }
+
+        this.password = undefined;
+        this.passwordMatch = undefined;
       }
   
-      _resetPW() {
+      _resetPassword() {
         const validEmail = this.$.signinEmail.validate();
-        if (this.email) {
+        if (validEmail) {
           this.$.FBAuth.auth.sendPasswordResetEmail(this.email);
         }
       }
@@ -322,9 +297,15 @@
         this.selected = 0;
       }
 
+      _passwordChanged(password) {
+        this.$.signinPassword.validate();
+        this.$.signupPassword.validate();
+      }
+
       _passwordMismatch(passwordMatch) {
         let invalid = true;
-        if(passwordMatch === this.password) {
+        if(passwordMatch !== undefined &&
+          passwordMatch === this.password) {
           invalid = false;
         }
 
@@ -333,19 +314,27 @@
       }
 
       _signedInChanged(signedIn) {
-        this.password = '';
-        this.passwordMatch = '';
-        this.title = '';
-        this.titleIndex
+        this.password = undefined;
+        this.passwordMatch = undefined;
+        this.title = undefined;
+        this.titleIndex = undefined;
         this.selected = 1;
+        this.forgotPassword = false;
+        this.forgotEmail= false;
       }
 
       _userChanged(user) {
-        if (this.newTitle !== '') {
+        if (this.newTitle !== undefined) {
           this.$.FBSave.ref.push({
             title: this.title,
           });
-          this.newTitle = '';
+          this.newTitle = undefined;
+        }
+      }
+
+      _passwordKeyDown(e) {
+        if (e.keyCode === 13) {
+          this._signIn();
         }
       }
     }
