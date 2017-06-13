@@ -28,7 +28,8 @@
     "paper-radio-group": "PolymerElements/paper-radio-group#^2.0.0",
     "paper-slider": "PolymerElements/paper-slider#^2.0.0",
     "three.js": "mrdoob/three.js#dev",
-    "ami": "fnndsc/ami#dev"
+    "ami": "fnndsc/ami#dev",
+    "paper-tabs": "PolymerElements/paper-tabs#^2.0.0"
   },
   "resolutions": {
     "iron-flex-layout": "1 - 2",
@@ -45,7 +46,8 @@
     "iron-icon": "1 - 2",
     "firebase": "^4.1.1",
     "iron-resizable-behavior": "1 - 2",
-    "iron-selector": "1 - 2"
+    "iron-selector": "1 - 2",
+    "paper-icon-button": "1 - 2"
   },
   "devDependencies": {
     "web-component-tester": "Polymer/web-component-tester#^6.0.0-prerelease.7"

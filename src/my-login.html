@@ -1,10 +1,24 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../bower_components/polymer/lib/elements/dom-if.html">
-<link rel="import" href="shared-styles.html">
+
+<link rel="import" href="../bower_components/neon-animation/web-animations.html">
+
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
 
 <link rel="import" href="../bower_components/polymerfire/firebase-auth.html">
-<link rel="import" href="../bower_components/paper-button/paper-button.html">
-<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-query.html">
+
+<link rel="import" href="shared-styles.html">
 
 <dom-module id="my-login">
   <template>
@@ -72,29 +86,104 @@
       min-width: 200px;
       margin: 0 auto;
     }
+
+    .card {
+      width: 356px;
+    }
+
+    paper-dropdown-menu {
+      width: 100%;
+    }
     </style>
 
     <firebase-auth
       id="FBAuth"
       user="{{user}}"
       signed-in="{{signedIn}}"
-      status-known="{{statusKnown}}"
       on-error="_handleEmailPWError">
     </firebase-auth>
 
+    <firebase-query
+      id="FBSave"
+      path="/users/[[user.uid]]/preferences">
+    </firebase-query>
+
     <div class="container">
       <div class="card">
-        <div>
-          <div id="emailPWError"></div>
-          <div id="emailPWMessage"></div>
-        </div>
-        <form on-submit="_signInEmailPW">
-          <paper-input id="emailInput" type="email" label="Email" value="{{email}}" validator="email-validator" error-message="Invalid email address" required auto-validate></paper-input>
-          <paper-input id="pwInput" type="password" label="Password" value="{{pw}}" required></paper-input>
-          <p><a href="#" id="reset" on-click="_resetPW">Reset password for entered email</a></p>
-          <paper-button id="emailSignUp" type="submit" on-tap="_signUpEmailPW" hidden$="[[noSignUp]]">Sign Up</paper-button>
-          <paper-button id="emailSignIn" type="submit" on-tap="_signInEmailPW">Sign In</paper-button>
-        </form>
+
+        <paper-tabs selected="{{selected}}">
+          <paper-tab>Sign up</paper-tab>
+          <paper-tab>Sign in</paper-tab>
+        </paper-tabs>
+
+        <iron-pages selected="{{selected}}">
+          <div>
+            <div>Create an account</div>
+            <paper-input
+              id="signupEmail"
+              type="email"
+              label="Email"
+              value="{{email}}"
+              validator="email-validator"
+              error-message="Invalid email address" required auto-validate></paper-input>
+            <paper-input
+              id="signupPassword"
+              type="password"
+              value="{{password}}"
+              minlength="6"
+              char-counter
+              label="Password"
+              error-message="Password must be at lest 6 characters" required></paper-input>
+            <paper-input
+              id="signupPasswordConfirm"
+              type="password"
+              value="{{passwordMatch}}"
+              minlength="6"
+              char-counter
+              type="password"
+              label="Confirm Password"
+              error-message="Password do not match"
+              required></paper-input>
+            <paper-dropdown-menu
+              id="signupTitle"
+              label="Title"
+              selected-item-label="{{title}}" required>
+              <paper-listbox slot="dropdown-content" selected="{{titleIndex}}">
+                <paper-item>Intern</paper-item>
+                <paper-item>Medical Doctor</paper-item>
+                <paper-item>Physicist</paper-item>
+                <paper-item>Technician</paper-item>
+                <paper-item>Other</paper-item>
+              </paper-listbox>
+            </paper-dropdown-menu>
+            <paper-button type="submit" on-tap="_signUp">Sign Up</paper-button>
+            <p hidden$="[[!forgotPassword]]"><a href="#" id="reset" on-click="_resetPW">Email already used. Email new password?</a></p>
+          </div>
+          <div>
+            <div>Log into you account</div>
+            <form on-submit="_signInEmailPW">
+              <paper-input
+                id="signinEmail"
+                type="email"
+                label="Email"
+                value="{{email}}"
+                validator="email-validator"
+                error-message="Invalid email address" required auto-validate></paper-input>
+              <paper-input
+                id="signinPassword"
+                type="password"
+                value="{{password}}"
+                minlength="6"
+                char-counter
+                label="Password"
+                error-message="Invalid password" required></paper-input>
+              <paper-button type="submit" on-tap="_signIn">Sign In</paper-button>
+              <p hidden$="[[!forgotPassword]]"><a href="#" id="reset" on-click="_resetPW">Incorrect password. Email new password?</a></p>
+              <p hidden$="[[!forgotEmail]]"><a href="#" id="reset" on-click="_gotoSignUp">Unkown email. Create account?</a></p>
+              [[this.message]]
+            </form>
+          </div>
+        </iron-pages>
       </div>
     </div>
 
@@ -113,43 +202,45 @@
             type: Object,
             value: {},
             notify: true,
-            reflectToAttribute: true
+            reflectToAttribute: true,
+            observer: '_userChanged',
           },
-          /**
-          * `signedIn` represents the signed in state returned by the firebase-auth element
-          */
+          selected: {
+            type: Number,
+            value: 1,
+          },
+          email: {
+            type: String,
+            value: '',
+          },
+          password: {
+            type: String,
+            value: '',
+          },
+          passwordMatch: {
+            type: String,
+            value: '',
+            observer: '_passwordMismatch',
+          },
+          message: {
+            type: String,
+            value: '',
+          },
+          forgotPassword: {
+            type: Boolean,
+            value: false,
+          },
+          forgotEmail: {
+            type: Boolean,
+            value: false,
+          },
           signedIn: {
             type: Boolean,
-            notify: true,
-            reflectToAttribute: true
+            observer: '_signedInChanged',
           },
-          /**
-          * `allows to set custom password reset message `
-          */
-          passwordResetMessage: {
+          newTitle: {
             type: String,
-            value:  "Password reset email has been sent. Please check your inbox.",
-          },
-          /**
-          * If true, SignUp will be hidden.
-          */
-          noSignUp: {
-            type: Boolean,
-            value: false,
-          },
-          /**
-          * If true, will sign up a user who attempts to sign in with an account that doesn't already exist
-          */
-          autoSignUp: {
-            type: Boolean,
-            value: false,
-          },
-          /**
-          * `statusKnown` represents the status known state returned by the firebase-auth element
-          */
-          statusKnown: {
-            type: Boolean,
-            notify: true,
+            value: '',
           },
         };
       }
@@ -159,50 +250,102 @@
         this.$.emailPWMessage.textContent = '';
       }
 
-      _signInEmailPW(e) {
-        this._cleanMessages();
-        this.$.FBAuth.signInWithEmailAndPassword(this.email, this.pw);
+      _signIn(e) {
+        // this._cleanMessages();
+
+        // validate
+        const validEmail = this.$.signinEmail.validate();
+        const validPassword = this.$.signinPassword.validate();
+
+        if (validEmail && validPassword) {
+          this.$.FBAuth.signInWithEmailAndPassword(this.email, this.password);
+        }
       }
 
-      _signUpEmailPW(e) {
-        if (this.noSignUp) return;
-        this._cleanMessages();
-        this.$.FBAuth.createUserWithEmailAndPassword(this.email, this.pw);
+      _signUp(e) {
+        // validate
+        const validEmail = this.$.signupEmail.validate();
+        const validPassword = this.$.signupPassword.validate();
+        const validPasswordConfirm = !this._passwordMismatch(this.passwordMatch);
+        const validTitle = this.$.signupTitle.validate();
+
+        if (validEmail &&
+          validPassword &&
+          validPasswordConfirm &&
+          validTitle) {
+
+          // sign up and sign in!
+          this.$.FBAuth.createUserWithEmailAndPassword(this.email, this.password)
+          .then((response) => {
+            this.newTitle = this.title;
+          });
+        }
       }
 
       _handleEmailPWError(err) {
-        if(err.detail.code === "auth/user-not-found" && this.autoSignUp){
-          this.$.FBAuth.createUserWithEmailAndPassword(this.email, this.pw)
-          this.email = null;
-          this.pw = null;
+        if(err.detail.code === "auth/wrong-password"){
+          this.$.signinPassword.invalid = true;
+          this.password = '';
+          this.passwordMatch = '';
+          this.forgotPassword = true;
+          this.forgotEmail = false;
+        } else if(err.detail.code === "auth/user-not-found") {
+          this.$.signinEmail.invalid = true;
+          this.password = '';
+          this.passwordMatch = '';
+          this.forgotPassword = false;
+          this.forgotEmail = true;
+        } else if(err.detail.code === "auth/email-already-in-use") {
+          this.$.signupPassword.invalid = true;
+          this.password = '';
+          this.passwordMatch = '';
+          this.forgotPassword = true;
+          this.forgotEmail = false;
         } else {
-          this.$.emailPWError.textContent = err.detail.message;
+          this.email = '';
+          this.password = '';
+          this.passwordMatch = '';
+          this.selected = '';
+          this.forgotPassword = false;
+          this.forgotEmail = false;
         }
       }
   
       _resetPW() {
-        this._cleanMessages();
+        const validEmail = this.$.signinEmail.validate();
         if (this.email) {
-          this.$.FBAuth.auth.sendPasswordResetEmail(this.email)
-          .then(
-            () => {
-              this.$.emailPWMessage.textContent = this.passwordResetMessage;
-            },
-            (err) => {
-              this.$.emailPWError.textContent = err.message;
-            }
-          );
-        } else {
-          this.$.emailPWError.textContent = "Please enter a valid email address.";
+          this.$.FBAuth.auth.sendPasswordResetEmail(this.email);
         }
       }
 
-      /**
-       * Signs out the signed in user
-       */
-      signOut() {
-        if (this.signedIn) {
-          this.$.FBAuth.signOut();
+      _gotoSignUp() {
+        this.selected = 0;
+      }
+
+      _passwordMismatch(passwordMatch) {
+        let invalid = true;
+        if(passwordMatch === this.password) {
+          invalid = false;
+        }
+
+        this.$.signupPasswordConfirm.invalid = invalid;
+        return invalid;
+      }
+
+      _signedInChanged(signedIn) {
+        this.password = '';
+        this.passwordMatch = '';
+        this.title = '';
+        this.titleIndex
+        this.selected = 1;
+      }
+
+      _userChanged(user) {
+        if (this.newTitle !== '') {
+          this.$.FBSave.ref.push({
+            title: this.title,
+          });
+          this.newTitle = '';
         }
       }
     }
