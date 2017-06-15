@@ -38,13 +38,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       .content {
         display: flex;
         height: 100%;
-        background-color: var(--dark-primary-color);
+        background-color: #fff;
       }
 
       .answer {
         display:flex;
         flex-direction: column;
-        width: 256px;
+        min-width: 256px;
       }
 
       .viewers {
@@ -76,6 +76,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         height: 50%;
       }
 
+      paper-radio-button {
+        width: 100%;
+      }
+
     </style>
 
     <firebase-auth
@@ -99,8 +103,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <app-header-layout fullbleed>
       <app-header slot="header" fixed condenses effects="waterfall">
         <app-toolbar>
+          <a name="view3" href="/home/"><paper-icon-button icon="arrow-back"></paper-icon-button></a>
           <div main-title>[[userCase.id]]</div>
-          <a name="view3" href="/home/"><paper-icon-button icon="my-icons:close"></paper-icon-button></a>
         </app-toolbar>
       </app-header>
       <div class="content">

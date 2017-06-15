@@ -72,28 +72,24 @@
         justify-content: center;
         -webkit-flex-wrap: wrap;
         flex-wrap: wrap;
-          margin-top: 15px;
-            padding: 1.5%;
+        margin-top: 15px;
+        padding: 1.5%;
         -webkit-box-sizing: border-box;
         -moz-box-sizing: border-box;
         box-sizing: border-box;
       }
 
     paper-card {
-      max-width: 400px;
+      width: 400px;
       position: relative;
       margin-bottom: 20px;
       margin-right: 10px;
       margin-left: 10px;
-    }
-
-    paper-card {
       --paper-card-header-image:{
         -moz-transition: all 0.1s;
         -webkit-transition: all 0.1s;
         transition: all 0.1s;
         height: 256px;
-        width: 400px;
         object-fit: cover;
         -webkit-filter: grayscale(.7);
         filter: grayscale(.7);
@@ -103,7 +99,6 @@
     paper-card:hover{
       --paper-card-header-image:{
         height: 256px;
-        width: 400px;
         object-fit: cover;
         -webkit-filter: none;
         filter: none;
@@ -116,7 +111,7 @@
       };
     }
 
-    @media (max-width: 400px) {
+    @media (max-width: 300px) {
       paper-card {
 		    width: 100%;
       }
@@ -136,10 +131,6 @@
       vertical-align: middle;
     }
 
-    .cafe-reserve {
-      color: var(--google-blue-500);
-    }
-
     iron-icon.star {
       --iron-icon-width: 16px;
       --iron-icon-height: 16px;
@@ -148,14 +139,6 @@
 
     iron-icon.star.grey{
       color: var(--paper-grey-500);
-    }
-
-    .drawerHeader {
-      color: #fff;
-      background-size: cover;
-      background-position: center center;
-      background-repeat: no-repeat;
-      background-image: url('/image.png');
     }
 
     .welcome {
@@ -175,17 +158,23 @@
       font-weight: lighter;
     }
 
-    /*.tags {
-      height: 100%;
-      overflow-y: auto;
-    }*/
-
     .separator {
       padding: 16px;
       font-size: 14px;
       font-weight: lighter;
       color: #aaa;
       border-top: 1px solid var(--divider-color);
+    }
+
+    a {
+      color: -webkit-link;
+      cursor: auto;
+      text-decoration: none;
+    }
+
+    a paper-button {
+      background-color: var(--default-primary-color);
+      color: #fff;
     }
 
     </style>
@@ -272,8 +261,8 @@
               </div>
               <div class="card-actions">
                 <div class="horizontal justified">
-                  <a name="view3" href="/case/[[mycase.id]]"><paper-button class="cafe-reserve">Case</paper-button></a>
-                  <paper-button class="cafe-reserve" disabled>Contouring</paper-button> 
+                  <a name="view3" href="/case/[[mycase.id]]"><paper-button>Case</paper-button></a>
+                  <paper-button disabled>Contouring</paper-button> 
                 </div>
               </div>
             </paper-card>
