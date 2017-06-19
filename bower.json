@@ -29,7 +29,8 @@
     "paper-slider": "PolymerElements/paper-slider#^2.0.0",
     "three.js": "mrdoob/three.js#dev",
     "ami": "fnndsc/ami#dev",
-    "paper-tabs": "PolymerElements/paper-tabs#^2.0.0"
+    "paper-tabs": "PolymerElements/paper-tabs#^2.0.0",
+    "iron-image": "PolymerElements/iron-image#^2.1.1"
   },
   "resolutions": {
     "iron-flex-layout": "1 - 2",

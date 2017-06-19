@@ -12,6 +12,7 @@
 
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../bower_components/iron-icons/communication-icons.html">
+<link rel="import" href="../bower_components/iron-image/iron-image.html">
 
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/paper-card/paper-card.html">
@@ -96,19 +97,29 @@
       };
     }
 
-    paper-card:hover{
-      --paper-card-header-image:{
-        height: 256px;
-        object-fit: cover;
-        -webkit-filter: none;
-        filter: none;
-        -moz-transition: all 0.1s;
-        -webkit-transition: all 0.1s;
-        transition: all 0.1s;
-        -moz-transform: scale(1.05);
-        -webkit-transform: scale(1.05);
-        transform: scale(1.05);
-      };
+    iron-image {
+      height: 256px;
+      -moz-transition: all 0.1s;
+      -webkit-transition: all 0.1s;
+      transition: all 0.1s;
+      object-fit: cover;
+      -webkit-filter: grayscale(.7);
+      filter: grayscale(.7);
+    }
+
+    paper-card:hover {
+      @apply --shadow-elevation-12dp
+    }
+
+    paper-card:hover iron-image{
+      -webkit-filter: none;
+      filter: none;
+      -moz-transition: all 0.1s;
+      -webkit-transition: all 0.1s;
+      transition: all 0.1s;
+      -moz-transform: scale(1.01);
+      -webkit-transform: scale(1.01);
+      transform: scale(1.01);
     }
 
     @media (max-width: 300px) {
@@ -224,7 +235,7 @@
           <app-toolbar>
             <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
             <div main-title>DLINE - Contouring Atlases</div>
-                    <div class="email">
+            <div class="email">
           <div>{{user.email}}</div><paper-icon-button icon="icons:exit-to-app" on-tap="_handleLogout"></paper-icon-button>
         </div>
           </app-toolbar>
@@ -233,8 +244,10 @@
         <div class="container">
 
           <template is="dom-repeat" items="{{allCases}}" as="mycase" filter="{{_filterCases(filter)}}">
-
-            <paper-card image="[[mycase.cover]]">
+            <paper-card>
+              <iron-image style="width:400px; height:256ps; background-color: lightgray;"
+                sizing="cover" preload src="[[mycase.cover]]"></iron-image>
+              </iron-image>
               <div class="card-content">
                 <div class="cafe-header">[[mycase.title]]
                   <div class="cafe-location cafe-light">
