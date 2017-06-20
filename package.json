@@ -7,6 +7,7 @@
     "eslint-plugin-html": "^2.0.0"
   },
   "scripts": {
+    "build": "polymer build --verbose --css-minify --html-minify --bundle --add-service-worker --add-push-manifest --insert-prefetch-links",
     "lint": "npm run lint:javascript",
     "lint:javascript": "eslint . --ext js,html --ignore-path .gitignore",
     "test": "polymer test",

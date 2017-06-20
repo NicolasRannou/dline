@@ -157,7 +157,7 @@
       background-size: cover;
       background-position: center center;
       background-repeat: no-repeat;
-      background-image: url('/image.png');
+      background-image: url('../images/image.png');
       margin-bottom: 16px;
     }
 
@@ -186,6 +186,10 @@
     a paper-button {
       background-color: var(--default-primary-color);
       color: #fff;
+    }
+
+    .completed {
+      color: var(--accent-color);
     }
 
     </style>
@@ -252,8 +256,8 @@
                 <div class="cafe-header">[[mycase.title]]
                   <div class="cafe-location cafe-light">
                     <template is="dom-if" if="{{mycase.completed}}">
-                      <iron-icon icon="icons:done"></iron-icon>
-                      <span>Completed</span>
+                      <iron-icon class="completed" icon="icons:done"></iron-icon>
+                      <span class="completed">Completed</span>
                     </template>
                     <template is="dom-if" if="{{!mycase.completed}}">
                       <iron-icon icon="icons:clear"></iron-icon>

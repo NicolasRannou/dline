@@ -15,6 +15,7 @@ module.exports = {
     '/index.html',
     '/manifest.json',
     '/bower_components/webcomponentsjs/*',
+    'bower_components/web-animations-js/web-animations-next-lite.min.js',
   ],
   navigateFallback: 'index.html',
 };

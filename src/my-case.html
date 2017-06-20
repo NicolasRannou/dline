@@ -36,6 +36,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         display: block;
       }
 
+      app-header {
+        background-color: var(--dark-primary-color);
+        color: var(--text-primary-color);
+      }
+
+      app-header paper-icon-button {
+        --paper-icon-button-ink-color: white;
+      }
+
       .content {
         display: flex;
         height: 100%;
@@ -73,13 +82,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         justify-content: center;
       }
 
-      .main, .small {
+      .main, .small, .s2 {
         display: flex;
         flex-direction: column;
         overflow: hidden;
       }
 
       paper-slider {
+        background-color: var(--default-primary-color);
         width: 100%;
       }
 
@@ -112,13 +122,34 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         padding-right: 16px;
       }
 
-    .separator {
-      padding: 16px;
-      font-size: 14px;
-      font-weight: lighter;
-      color: #aaa;
-      border-top: 1px solid var(--divider-color);
-    }
+      .separator {
+        padding: 16px;
+        font-size: 14px;
+        font-weight: lighter;
+        color: #aaa;
+        border-top: 1px solid var(--divider-color);
+      }
+
+      .s2 {
+        border: 1px solid #ffffff;
+      }
+
+      .main {
+        border-top: 1px solid #ffffff;
+        border-bottom: 1px solid #ffffff;
+      }
+
+
+      a {
+        color: #fff;
+        cursor: auto;
+        text-decoration: none;
+      }
+
+      /*a paper-button {
+        background-color: var(--default-primary-color);
+        color: #fff;
+      }*/
 
 
 /*https://codepen.io/nikhil8krishnan/pen/dMEzGx*/
@@ -383,15 +414,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               <div class="loader">
                 <div>
                   <div class="cube-wrapper">
-  <!--https://codepen.io/nikhil8krishnan/pen/dMEzGx-->
-  <div class="cube-folding">
-    <span class="leaf1"></span>
-    <span class="leaf2"></span>
-    <span class="leaf3"></span>
-    <span class="leaf4"></span>
-  </div>
-  <span class="loading" data-name="Loading">Loading ([[fetchProgress]]%)</span>
-</div>
+                    <!--https://codepen.io/nikhil8krishnan/pen/dMEzGx-->
+                    <div class="cube-folding">
+                      <span class="leaf1"></span>
+                      <span class="leaf2"></span>
+                      <span class="leaf3"></span>
+                      <span class="leaf4"></span>
+                    </div>
+                    <span class="loading" data-name="Loading">Loading ([[fetchProgress]]%)</span>
+                  </div>
                 </div>
               </div>
             </template>
@@ -406,28 +437,32 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                   contours="[[contours]]"
                   on-goto="_handleGoto"></ami-viewer-2d>
               </div>
-              <paper-slider></paper-slider>
+              <paper-slider min="0" max="[[v0max]]" value="{{stackIndex0}}" immediate-value="{{stackIndex0}}"></paper-slider>
             </div>
             <div class="small">
-              <div class="v2">
-                <ami-viewer-2d
-                  id="second"
-                  class="viewer"
-                  stack-index="{{stackIndex1}}"
-                  stack-scene="[[stackScene1]]"
-                  contours="[[contours]]"
-                  on-goto="_handleGoto"></ami-viewer-2d>
-                  <!--<paper-slider></paper-slider>-->
+              <div class="s2">
+                <div class="v2">
+                  <ami-viewer-2d
+                    id="second"
+                    class="viewer"
+                    stack-index="{{stackIndex1}}"
+                    stack-scene="[[stackScene1]]"
+                    contours="[[contours]]"
+                    on-goto="_handleGoto"></ami-viewer-2d>
+                </div>
+                <paper-slider min="0" max="[[v1max]]" value="{{stackIndex1}}" immediate-value="{{stackIndex1}}"></paper-slider>
               </div>
-              <div class="v2">
-                <ami-viewer-2d
-                  id="third"
-                  class="viewer"
-                  stack-index="{{stackIndex2}}"
-                  stack-scene="[[stackScene2]]"
-                  contours="[[contours]]"
-                  on-goto="_handleGoto"></ami-viewer-2d>
-                  <!--<paper-slider></paper-slider>-->
+              <div class="s2">
+                <div class="v2">
+                  <ami-viewer-2d
+                    id="third"
+                    class="viewer"
+                    stack-index="{{stackIndex2}}"
+                    stack-scene="[[stackScene2]]"
+                    contours="[[contours]]"
+                    on-goto="_handleGoto"></ami-viewer-2d>
+                </div>
+                <paper-slider min="0" max="[[v2max]]" value="{{stackIndex2}}" immediate-value="{{stackIndex2}}"></paper-slider>
               </div>
             </div>
           </div>
@@ -489,6 +524,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             type: Number,
             observer: '_stackIndexChanged',
           },
+          v0max: {
+            type: Number,
+            value: 0,
+          },
           stackScene1: {
             type: Object,
             value: {},
@@ -497,6 +536,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             type: Number,
             observer: '_stackIndexChanged',
           },
+          v1max: {
+            type: Number,
+            value: 0,
+          },
           stackScene2: {
             type: Object,
             value: {},
@@ -504,6 +547,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           stackIndex2: {
             type: Number,
             observer: '_stackIndexChanged',
+          },
+          v2max: {
+            type: Number,
+            value: 0,
           },
           contours: {
             type: Array,
@@ -672,21 +719,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           const stack = series.stack[0];
           const stackHelper0 = new AMI.default.Helpers.Stack(stack);
           stackHelper0.slice.intensityAuto = false;
-          stackHelper0.slice.windowWidth = 1000;
-          stackHelper0.slice.windowCenter= -1000;
+          stackHelper0.slice.windowWidth = this.userCase.image.windowWidth;
+          stackHelper0.slice.windowCenter= this.userCase.image.windowLevel;
 
           const stackScene0 = new THREE.Scene();
           stackScene0.add(stackHelper0);
 
           const stackHelper1 = new AMI.default.Helpers.Stack(stack);
-          stackHelper1.slice.windowWidth = 1000;
-          stackHelper1.slice.windowCenter= 0;
+          stackHelper1.slice.windowWidth = this.userCase.image.windowWidth;
+          stackHelper1.slice.windowCenter= this.userCase.image.windowLevel;
           const stackScene1 = new THREE.Scene();
           stackScene1.add(stackHelper1);
 
           const stackHelper2 = new AMI.default.Helpers.Stack(stack);
-          stackHelper2.slice.windowWidth = 1000;
-          stackHelper2.slice.windowCenter= 0;
+          stackHelper2.slice.windowWidth = this.userCase.image.windowWidth;
+          stackHelper2.slice.windowCenter= this.userCase.image.windowLevel;
           const stackScene2 = new THREE.Scene();
           stackScene2.add(stackHelper2);
 
@@ -700,6 +747,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.$.third.orientation = 'sagittal';
           this.$.third.resize();
 
+          // update sliders
+          this.v0max = this.$.first.stackMaxIndex;
+          this.stackIndex0 = Math.floor(this.v0max/2);
+          this.v1max = this.$.second.stackMaxIndex;
+          this.stackIndex1 = Math.floor(this.v1max/2);
+          this.v2max = this.$.third.stackMaxIndex;
+          this.stackIndex2 = Math.floor(this.v2max/2);
+
+          // update flags
           this.loadingData = false;
           this.fetchProgress = 0;
         });
@@ -777,33 +833,33 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.$.first.localizers = [
           {
             plane: plane1,
-            color: new THREE.Color('#00ff00'),
+            color: new THREE.Color('#607d8b'),
           },
           {
             plane: plane2,
-            color: new THREE.Color('#00ff00'),
+            color: new THREE.Color('#607d8b'),
           },
         ];
 
         this.$.second.localizers = [
           {
             plane: plane0,
-            color: new THREE.Color('#00ff00'),
+            color: new THREE.Color('#607d8b'),
           },
           {
             plane: plane2,
-            color: new THREE.Color('#00ff00'),
+            color: new THREE.Color('#607d8b'),
           },
         ];
 
         this.$.third.localizers = [
           {
             plane: plane0,
-            color: new THREE.Color('#00ff00'),
+            color: new THREE.Color('#607d8b'),
           },
           {
             plane: plane1,
-            color: new THREE.Color('#00ff00'),
+            color: new THREE.Color('#607d8b'),
           },
         ];
       }

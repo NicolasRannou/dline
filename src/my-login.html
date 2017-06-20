@@ -176,7 +176,6 @@
             <paper-button on-tap="_signIn">Sign In</paper-button>
             <p hidden$="[[!forgotPassword]]"><a href="#" class="clickable message" on-click="_resetPassword">Incorrect password. Email new password?</a></p>
             <p hidden$="[[!forgotEmail]]"><a href="#" class="clickable message" on-click="_gotoSignUp">Unkown email. Create account?</a></p>
-            [[this.message]]
           </div>
         </iron-pages>
       </div>
@@ -212,10 +211,6 @@
           passwordMatch: {
             type: String,
             observer: '_passwordMismatch',
-          },
-          message: {
-            type: String,
-            value: '',
           },
           forgotPassword: {
             type: Boolean,

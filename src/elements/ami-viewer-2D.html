@@ -260,8 +260,9 @@
         });
         this._renderer.autoClear = false;
         this._renderer.localClippingEnabled = true;
+        this._renderer.setClearColor(0x424242);
         this._renderer.setSize(
-        this._container.clientWidth, this._container.clientHeight);
+          this._container.clientWidth, this._container.clientHeight);
         this._container.appendChild( this._renderer.domElement );
       }
 
