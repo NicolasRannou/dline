@@ -75,6 +75,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       .main, .small {
         display: flex;
+        flex-direction: column;
+        overflow: hidden;
       }
 
       paper-slider {
@@ -85,9 +87,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         width: 70%;
       }
 
+      .mainV {
+        display: flex;
+        flex: 1;
+      }
+
       .small {
         width: 30%;
-        flex-direction: column;
       }
 
       .small > * {
@@ -390,36 +396,38 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               </div>
             </template>
             <div class="main">
-              <ami-viewer-2d
-                id="first"
-                class="viewer"
-                show-information
-                stack-index="{{stackIndex0}}"
-                stack-scene="[[stackScene0]]"
-                contours="[[contours]]"
-                on-goto="_handleGoto"></ami-viewer-2d>
-              <!--<paper-slider></paper-slider>-->
+              <div class="mainV">
+                <ami-viewer-2d
+                  id="first"
+                  class="viewer"
+                  show-information
+                  stack-index="{{stackIndex0}}"
+                  stack-scene="[[stackScene0]]"
+                  contours="[[contours]]"
+                  on-goto="_handleGoto"></ami-viewer-2d>
+              </div>
+              <paper-slider></paper-slider>
             </div>
             <div class="small">
               <div class="v2">
-              <ami-viewer-2d
-                id="second"
-                class="viewer"
-                stack-index="{{stackIndex1}}"
-                stack-scene="[[stackScene1]]"
-                contours="[[contours]]"
-                on-goto="_handleGoto"></ami-viewer-2d>
-                <!--<paper-slider></paper-slider>-->
+                <ami-viewer-2d
+                  id="second"
+                  class="viewer"
+                  stack-index="{{stackIndex1}}"
+                  stack-scene="[[stackScene1]]"
+                  contours="[[contours]]"
+                  on-goto="_handleGoto"></ami-viewer-2d>
+                  <!--<paper-slider></paper-slider>-->
               </div>
               <div class="v2">
-              <ami-viewer-2d
-                id="third"
-                class="viewer"
-                stack-index="{{stackIndex2}}"
-                stack-scene="[[stackScene2]]"
-                contours="[[contours]]"
-                on-goto="_handleGoto"></ami-viewer-2d>
-                <!--<paper-slider></paper-slider>-->
+                <ami-viewer-2d
+                  id="third"
+                  class="viewer"
+                  stack-index="{{stackIndex2}}"
+                  stack-scene="[[stackScene2]]"
+                  contours="[[contours]]"
+                  on-goto="_handleGoto"></ami-viewer-2d>
+                  <!--<paper-slider></paper-slider>-->
               </div>
             </div>
           </div>
