@@ -54,6 +54,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         position: relative;
       }
 
+      .viewer {
+        display: flex;
+        flex: 1;
+        width: 0;
+      }
+
       .loader {
         position: fixed;
         top: 0;
@@ -86,6 +92,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       .small > * {
         height: 50%;
+      }
+
+      .v2 {
+        display: flex;
+        flex: 1;
       }
 
       paper-radio-button {
@@ -381,28 +392,35 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <div class="main">
               <ami-viewer-2d
                 id="first"
-                class="viewers"
+                class="viewer"
                 show-information
                 stack-index="{{stackIndex0}}"
                 stack-scene="[[stackScene0]]"
                 contours="[[contours]]"
                 on-goto="_handleGoto"></ami-viewer-2d>
+              <!--<paper-slider></paper-slider>-->
             </div>
             <div class="small">
+              <div class="v2">
               <ami-viewer-2d
                 id="second"
-                class="viewers"
+                class="viewer"
                 stack-index="{{stackIndex1}}"
                 stack-scene="[[stackScene1]]"
                 contours="[[contours]]"
                 on-goto="_handleGoto"></ami-viewer-2d>
+                <!--<paper-slider></paper-slider>-->
+              </div>
+              <div class="v2">
               <ami-viewer-2d
                 id="third"
-                class="viewers"
+                class="viewer"
                 stack-index="{{stackIndex2}}"
                 stack-scene="[[stackScene2]]"
                 contours="[[contours]]"
                 on-goto="_handleGoto"></ami-viewer-2d>
+                <!--<paper-slider></paper-slider>-->
+              </div>
             </div>
           </div>
       </div>
