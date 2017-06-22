@@ -222,10 +222,10 @@
             <paper-item label="all" class="label">All cases ([[allCases.length]])</paper-item>
             <paper-item label="completed" class="label">Completed ([[completed]])</paper-item>
             <paper-item label="todo" class="label">To do ([[todo]])</paper-item>
-            <div class="separator">All labels</div>
+            <!--<div class="separator">All labels</div>
             <template is="dom-repeat" items="{{tags}}" as="tag">
               <paper-item label$="[[tag.value]]" class="label">[[tag.value]] ([[tag.count]])</paper-item>
-            </template>
+            </template>-->
           </paper-listbox>
         </div>
         </div>
@@ -249,9 +249,9 @@
 
           <template is="dom-repeat" items="{{allCases}}" as="mycase" filter="{{_filterCases(filter)}}">
             <paper-card>
-              <iron-image style="width:400px; height:256ps; background-color: lightgray;"
+              <!--<iron-image style="width:400px; height:256ps; background-color: lightgray;"
                 sizing="cover" preload src="[[mycase.cover]]"></iron-image>
-              </iron-image>
+              </iron-image>-->
               <div class="card-content">
                 <div class="cafe-header">[[mycase.title]]
                   <div class="cafe-location cafe-light">
@@ -265,21 +265,20 @@
                     </template>
                   </div>
                 </div>
-                <div class="cafe-rating">
-                  <!-- tags -->
+                <!--<div class="cafe-rating">
                   <iron-icon class$="{{_fillStar(1, mycase.difficulty)}}" icon="star"></iron-icon>
                   <iron-icon class$="{{_fillStar(2, mycase.difficulty)}}" icon="star"></iron-icon>
                   <iron-icon class$="{{_fillStar(3, mycase.difficulty)}}" icon="star"></iron-icon>
                   <iron-icon class$="{{_fillStar(4, mycase.difficulty)}}" icon="star"></iron-icon>
                   <iron-icon class$="{{_fillStar(5, mycase.difficulty)}}" icon="star"></iron-icon>
                 </div>
-                <p>Author・[[mycase.author]]</p>
+                <p>Author・[[mycase.author]]</p>-->
                 <p class="cafe-light">[[mycase.description]]</p>
               </div>
               <div class="card-actions">
                 <div class="horizontal justified">
-                  <a name="view3" href="case/[[mycase.id]]"><paper-button>Case</paper-button></a>
-                  <paper-button disabled>Contouring</paper-button> 
+                  <a name="view3" href="case/[[mycase.id]]"><paper-button>Open</paper-button></a>
+                  <!--<paper-button disabled>Contouring</paper-button> -->
                 </div>
               </div>
             </paper-card>

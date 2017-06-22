@@ -16,7 +16,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
 <link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
 
+<link rel="import" href="../bower_components/iron-collapse/iron-collapse.html">
+
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/paper-radio-button/paper-radio-button.html">
 <link rel="import" href="../bower_components/paper-radio-group/paper-radio-group.html">
@@ -86,6 +89,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         display: flex;
         flex-direction: column;
         overflow: hidden;
+        position: relative;
+      }
+
+      .move {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
       }
 
       paper-slider {
@@ -97,11 +107,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         width: 70%;
       }
 
-      .mainV {
-        display: flex;
-        flex: 1;
-      }
-
       .small {
         width: 30%;
       }
@@ -110,7 +115,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         height: 50%;
       }
 
-      .v2 {
+       .v2 {
         display: flex;
         flex: 1;
       }
@@ -144,6 +149,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         color: #fff;
         cursor: auto;
         text-decoration: none;
+      }
+
+      .fulloff {
+        height: 24px;
+        padding: 0;
+        font-size: 12px;
+        color: #d9d9d9;
+        position: absolute;
+        top:0;
+        right: 0;
+        z-index: 1;
       }
 
       /*a paper-button {
@@ -389,14 +405,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </app-header>
       <div class="content">
           <div class="answer">
-            <div class="separator">Best contour:</div>
+            <div class="separator">Best PVT is:</div>
             <paper-radio-group selected="{{contour}}">
               <paper-radio-button name="red">red</paper-radio-button>
               <paper-radio-button name="green">green</paper-radio-button>
               <paper-radio-button name="blue">blue</paper-radio-button>
               <paper-radio-button name="none">none</paper-radio-button>
             </paper-radio-group>
-            <div class="separator">Choice was:</div>
+            <div class="separator">Decision was:</div>
             <paper-radio-group selected="{{choice}}">
               <paper-radio-button name="easy">easy</paper-radio-button>
               <paper-radio-button name="average">average</paper-radio-button>
@@ -426,43 +442,67 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 </div>
               </div>
             </template>
-            <div class="main">
-              <div class="mainV">
-                <ami-viewer-2d
-                  id="first"
-                  class="viewer"
-                  show-information
-                  stack-index="{{stackIndex0}}"
-                  stack-scene="[[stackScene0]]"
-                  contours="[[contours]]"
-                  on-goto="_handleGoto"></ami-viewer-2d>
+            <div id="mainmain" class="main">
+              <div class="fulloff">
+                <button on-click="toggle">toggle collapse</button>
+                <iron-collapse id="collapse">
+                  <div>Content goes here...</div>
+                  Show/Hide: <paper-checkbox checked>Red</paper-checkbox> <paper-checkbox checked>Green</paper-checkbox> <paper-checkbox checked>Blue</paper-checkbox>
+                </iron-collapse>
               </div>
-              <paper-slider min="0" max="[[v0max]]" value="{{stackIndex0}}" immediate-value="{{stackIndex0}}"></paper-slider>
+              <div id="p1" class="move">
+                <div class="v2">
+                  <ami-viewer-2d
+                    id="first"
+                    class="viewer"
+                    show-information
+                    stack-index="{{stackIndex0}}"
+                    stack-scene="[[stackScene0]]"
+                    contours="[[contours]]"
+                    on-goto="_handleGoto"></ami-viewer-2d>
+                </div>
+                <paper-slider min="0" max="[[v0max]]" value="{{stackIndex0}}" immediate-value="{{stackIndex0}}"></paper-slider>
+              </div>
             </div>
             <div class="small">
-              <div class="s2">
-                <div class="v2">
-                  <ami-viewer-2d
-                    id="second"
-                    class="viewer"
-                    stack-index="{{stackIndex1}}"
-                    stack-scene="[[stackScene1]]"
-                    contours="[[contours]]"
-                    on-goto="_handleGoto"></ami-viewer-2d>
+              <div id="p2p2" class="s2">
+                <!--<app-toolbar>
+                  <div hidden="[[loadingData]]" main-title></div>-->
+                <div class="fulloff">
+                  Fullscreen
+                  <paper-icon-button icon="fullscreen" target="p2p2" on-tap="switch"></paper-icon-button>
                 </div>
-                <paper-slider min="0" max="[[v1max]]" value="{{stackIndex1}}" immediate-value="{{stackIndex1}}"></paper-slider>
+                <!--</app-toolbar>-->
+                <div id="p2" class="move">
+                  <div class="v2">
+                    <ami-viewer-2d
+                      id="second"
+                      class="viewer"
+                      stack-index="{{stackIndex1}}"
+                      stack-scene="[[stackScene1]]"
+                      contours="[[contours]]"
+                      on-goto="_handleGoto"></ami-viewer-2d>
+                  </div>
+                  <paper-slider min="0" max="[[v1max]]" value="{{stackIndex1}}" immediate-value="{{stackIndex1}}"></paper-slider>
+                </div>
               </div>
-              <div class="s2">
-                <div class="v2">
-                  <ami-viewer-2d
-                    id="third"
-                    class="viewer"
-                    stack-index="{{stackIndex2}}"
-                    stack-scene="[[stackScene2]]"
-                    contours="[[contours]]"
-                    on-goto="_handleGoto"></ami-viewer-2d>
+              <div id="p3p3" class="s2">
+                <div class="fulloff">
+                  Fullscreen
+                  <paper-icon-button icon="fullscreen" target="p3p3" on-tap="switch">Text</paper-icon-button>
                 </div>
-                <paper-slider min="0" max="[[v2max]]" value="{{stackIndex2}}" immediate-value="{{stackIndex2}}"></paper-slider>
+                <div id="p3" class="move">
+                  <div class="v2">
+                    <ami-viewer-2d
+                      id="third"
+                      class="viewer"
+                      stack-index="{{stackIndex2}}"
+                      stack-scene="[[stackScene2]]"
+                      contours="[[contours]]"
+                      on-goto="_handleGoto"></ami-viewer-2d>
+                  </div>
+                  <paper-slider min="0" max="[[v2max]]" value="{{stackIndex2}}" immediate-value="{{stackIndex2}}"></paper-slider>
+                </div>
               </div>
             </div>
           </div>
@@ -922,6 +962,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         // clean localizers
+      }
+
+      switch(event) {
+        const target = event.currentTarget.getAttribute('target');
+        const mainContainer = this.$.mainmain.children[1];
+        const smallContainer = this.$[target].children[1];
+        this.$.mainmain.appendChild(smallContainer);
+        this.$[target].appendChild(mainContainer);
+        this._resizeListener();
+      }
+
+      toggle() {
+        this.$.collapse.toggle();
       }
     }
 
