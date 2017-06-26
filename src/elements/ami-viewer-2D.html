@@ -12,8 +12,11 @@
       }
 
       #container {
-        width: 100%;
-        height: 100%;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        position: absolute;
         overflow: hidden;
       }
 
@@ -26,9 +29,15 @@
         width: 100%;
         height: 100%;
         overflow:hidden;
+        display: -webkit-box;
+        display: -ms-flexbox;
         display: flex;
-        align-items: center;
-        justify-content: center;
+        -webkit-box-align: center;
+            -ms-flex-align: center;
+                align-items: center;
+        -webkit-box-pack: center;
+            -ms-flex-pack: center;
+                justify-content: center;
         pointer-events: none;
 
       }
@@ -272,10 +281,13 @@
           antialias: true,
         });
         this._renderer.autoClear = false;
+        this._renderer.updateStyle = true;
         this._renderer.localClippingEnabled = true;
         this._renderer.setClearColor(0x424242);
+        console.log(this._container.offsetHeight);
         this._renderer.setSize(
           this._container.clientWidth, this._container.clientHeight);
+        console.log(this._container.offsetHeight);
         this._container.appendChild( this._renderer.domElement );
       }
 
@@ -503,7 +515,9 @@
           this._camera.canvas = canvas;
           this._camera.fitBox(2, 1);
 
+          console.log(this._container.offsetHeight);
           this._renderer.setSize(width, height);
+          console.log(this._container.offsetHeight);
 
           // update info to draw borders properly
           this.stackHelper.slice.canvasWidth = width;
