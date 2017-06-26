@@ -98,7 +98,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         flex-direction: column;
       }
 
-      paper-slider {
+      .move paper-slider {
         background-color: var(--default-primary-color);
         width: 100%;
       }
@@ -160,6 +160,34 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         top:0;
         right: 0;
         z-index: 1;
+        cursor: default;
+        font-weight: lighter;
+      }
+
+      .advanced {
+        display: flex;
+        flex-direction: column;
+        height: auto;
+        background-color: rgba(0, 0, 0, 0.8);
+        margin-bottom: 8px;
+      }
+
+      .controls {
+        height: 40px;
+        border-bottom: 1px solid var(--divider-color);
+        text-align: right;
+        padding: 0 8px;
+      }
+
+      #collapse > div {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 8px;
+      }
+
+      #collapse > div:last-child {
+        justify-content: center;
       }
 
       /*a paper-button {
@@ -424,6 +452,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               disabled$="[[_selectionDone(contour, choice)]]">
               Submit answer
             </paper-button>
+            <div hidden$="[[!answered]]">
+              <div class="separator">
+                <div>Your answer has been registered.</div>
+                <div>[[userCase.answerDetails]]</div>
+              </div>
+              
+            </div>
+
           </div>
           <div class="viewers">
             <template is="dom-if" if="[[loadingData]]">
@@ -443,11 +479,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               </div>
             </template>
             <div id="mainmain" class="main">
-              <div class="fulloff">
-                <button on-click="toggle">toggle collapse</button>
-                <iron-collapse id="collapse">
-                  <div>Content goes here...</div>
-                  Show/Hide: <paper-checkbox checked>Red</paper-checkbox> <paper-checkbox checked>Green</paper-checkbox> <paper-checkbox checked>Blue</paper-checkbox>
+              <div class="advanced fulloff">
+                <div class="controls">
+                  <span class="label">Controls</span>
+                  <paper-icon-button icon="my-icons:expand-more" target="p3p3" on-tap="toggle"></paper-icon-button>
+                </div>
+                <iron-collapse id="collapse" no-animation>
+                  <div>Show/Hide contours</div>
+                  <div>
+                    <paper-checkbox checked={{redShow}}>Red</paper-checkbox> <paper-checkbox checked={{greenShow}}>Green</paper-checkbox> <paper-checkbox checked={{blueShow}}>Blue</paper-checkbox>
+                  </div>
+                  <div>
+                    Win. Width: <paper-slider value="{{stackWindowWidth}}" immediate-value="{{stackWindowWidth}}" min="1" max="[[stackIntensityRange]]" secondary-progress="0"></paper-slider>
+                  </div>
+                  <div>
+                    Win. Level: <paper-slider value="{{stackWindowCenter}}" immediate-value="{{stackWindowCenter}}" min="[[stackIntensityMin]]" max="[[stackIntensityMax]]" secondary-progress="[[stackIntensityMin]]"></paper-slider>
+                  </div>
+                  <div>
+                    <paper-button on-tap="_resetIntensity">Reset</paper-button>
+                  </div>
                 </iron-collapse>
               </div>
               <div id="p1" class="move">
@@ -458,6 +508,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     show-information
                     stack-index="{{stackIndex0}}"
                     stack-scene="[[stackScene0]]"
+                    stack-window-center="[[stackWindowCenter]]"
+                    stack-window-width="[[stackWindowWidth]]"
                     contours="[[contours]]"
                     on-goto="_handleGoto"></ami-viewer-2d>
                 </div>
@@ -469,7 +521,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <!--<app-toolbar>
                   <div hidden="[[loadingData]]" main-title></div>-->
                 <div class="fulloff">
-                  Fullscreen
+                  <span class="label">Fullscreen</span>
                   <paper-icon-button icon="fullscreen" target="p2p2" on-tap="switch"></paper-icon-button>
                 </div>
                 <!--</app-toolbar>-->
@@ -480,6 +532,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                       class="viewer"
                       stack-index="{{stackIndex1}}"
                       stack-scene="[[stackScene1]]"
+                      stack-window-center="[[stackWindowCenter]]"
+                      stack-window-width="[[stackWindowWidth]]"
                       contours="[[contours]]"
                       on-goto="_handleGoto"></ami-viewer-2d>
                   </div>
@@ -488,7 +542,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               </div>
               <div id="p3p3" class="s2">
                 <div class="fulloff">
-                  Fullscreen
+                  <span class="label">Fullscreen</span>
                   <paper-icon-button icon="fullscreen" target="p3p3" on-tap="switch">Text</paper-icon-button>
                 </div>
                 <div id="p3" class="move">
@@ -498,6 +552,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                       class="viewer"
                       stack-index="{{stackIndex2}}"
                       stack-scene="[[stackScene2]]"
+                      stack-window-center="[[stackWindowCenter]]"
+                      stack-window-width="[[stackWindowWidth]]"
                       contours="[[contours]]"
                       on-goto="_handleGoto"></ami-viewer-2d>
                   </div>
@@ -556,6 +612,26 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             type: Object,
             value: {},
           },
+          stackWindowWidth: {
+            type: Number,
+            value: 0,
+          },
+          stackWindowCenter: {
+            type: Number,
+            value:0,
+          },
+          stackIntensityMin: {
+            type:Number,
+            value: 0,
+          },
+          stackIntensityMax: {
+            type:Number,
+            value: 0,
+          },
+          stackIntensityRange: {
+            type:Number,
+            value: 0,
+          },
           stackScene0: {
             type: Object,
             value: {},
@@ -604,6 +680,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             type: Number,
             value: 0,
           },
+          redShow: {
+            type:Boolean,
+            value: true,
+            observer: '_showChanged',
+          },
+          greenShow: {
+            type:Boolean,
+            value: true,
+            observer: '_showChanged',
+          },
+          blueShow: {
+            type:Boolean,
+            value: true,
+            observer: '_showChanged',
+          },
+          answered: {
+            type: Boolean,
+            value: false,
+          }
         };
       }
 
@@ -683,6 +778,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         // cleanup
         this._cleanup();
+        let imageLoaded = false;
         this.loadingData = true;
 
         // load the models
@@ -722,6 +818,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             // sceneClip.add(object.scene);
             this.push('contours', object);
+
+            if(this.contours.length === 3 && imageLoaded) {
+              this.loadingData = false;
+            }
           });
         };
 
@@ -795,9 +895,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.v2max = this.$.third.stackMaxIndex;
           this.stackIndex2 = Math.floor(this.v2max/2);
 
+          // update controls
+          this._resetIntensity();
+
+          this.redShow = true;
+          this.greenShow = true;
+          this.blueShow = true;
+
           // update flags
-          this.loadingData = false;
+          imageLoaded = true;
           this.fetchProgress = 0;
+          this.answered = false;
+
+          if(this.contours.length === 3 && imageLoaded) {
+            this.loadingData = false;
+          }
         });
 
         // fetch meshes
@@ -805,6 +917,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         // _meshesChanged
         // push it to viewers
+      }
+
+      _resetIntensity() {
+        // console.log(this.stackHelper);
+
+        const stack = this.stackScene0.children[0].stack;
+        this.stackIntensityMin = stack.minMax[0];
+        this.stackIntensityMax = stack.minMax[1];
+        this.stackIntensityRange = stack.minMax[1] - stack.minMax[0];
+        this.stackWindowWidth = this.stackIntensityRange;
+        this.stackWindowCenter = stack.minMax[0] + this.stackIntensityRange / 2;
       }
 
       _resizeListener() {
@@ -820,10 +943,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           id: this.userCase.id,
           contour: this.contour,
           choice: this.choice,
+          date: new Date().toString(),
         });
 
         this.contour = '';
         this.choice = '';
+        this.answered = true;
       }
 
       _selectionDone(contour, choice) {
@@ -975,6 +1100,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       toggle() {
         this.$.collapse.toggle();
+      }
+
+      _showChanged(show) {
+        for (let i=0; i<this.contours.length; i++) {
+          const label = this.contours[i].label;
+          const visible = this[`${label}Show`];
+          this.contours[i].meshBack.visible = visible;
+          this.contours[i].meshFront.visible = visible;
+        }
       }
     }
 

@@ -145,9 +145,11 @@
           },
           stackWindowWidth: {
             type: Number,
+            observer: '_stackWindowWidthChanged',
           },
           stackWindowCenter: {
             type: Number,
+            observer: '_stackWindowCenterChanged',
           },
           sizeX: {
             type: Number,
@@ -588,6 +590,13 @@
           this.stackHelper.index -= 1;
         }
         this.stackIndex = this.stackHelper.index;
+      }
+
+      _stackWindowWidthChanged(width) {
+        this.set('stackHelper.slice.windowWidth', width);
+      }
+      _stackWindowCenterChanged(center) {
+        this.set('stackHelper.slice.windowCenter', center);
       }
 
       _onMouseMove(event) {
