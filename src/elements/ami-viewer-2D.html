@@ -231,6 +231,7 @@
         this._clipPlane = null;
         this.stackHelper = null;
         this.orientation = 'default';
+        this._changed = true;
 
         this._initScene();
         this._initCamera();
@@ -274,6 +275,10 @@
         this._controls.noRotate = true;
         this._controls.target.set(0, 0, 0);
         this._camera.controls = this._controls;
+
+        this._controls.addEventListener('change', () => {
+          this._changed = true;
+        })
       }
 
       _initRenderer() {
@@ -348,28 +353,32 @@
       _animate() {
         this.animationFrameID = requestAnimationFrame(() => {this._animate()} );
         this._controls.update();
-        this._renderer.clear();
 
-        // this._mesh.rotation.x += 0.01;
-        // this._mesh.rotation.y += 0.02;
-        this._renderer.render( this._scene, this._camera );
-        this._renderer.clearDepth();
+        if (this._changed) {
+          this._renderer.clear();
 
-        // contours
-        if (this.contours.length >= 1 && this.stackHelper) {
-          this.contours.forEach((object, key) => {
-            object.materialFront.clippingPlanes = [this.clipPlane];
-            object.materialBack.clippingPlanes = [this.clipPlane];
-            this._renderer.render(object.scene, this._camera, this._contourTextureTarget, true);
-            this._renderer.clearDepth();
-            this._contourMaterial.uniforms.uWidth.value = object.selected ? 3 : 1;
-            this._renderer.render(this._contourScene, this._camera);
-          });
+          // this._mesh.rotation.x += 0.01;
+          // this._mesh.rotation.y += 0.02;
+          this._renderer.render( this._scene, this._camera );
+          this._renderer.clearDepth();
+
+          // contours
+          if (this.contours.length >= 1 && this.stackHelper) {
+            this.contours.forEach((object, key) => {
+              object.materialFront.clippingPlanes = [this.clipPlane];
+              object.materialBack.clippingPlanes = [this.clipPlane];
+              this._renderer.render(object.scene, this._camera, this._contourTextureTarget, true);
+              this._renderer.clearDepth();
+              this._contourMaterial.uniforms.uWidth.value = object.selected ? 3 : 1;
+              this._renderer.render(this._contourScene, this._camera);
+            });
+          }
+
+          // localizers
+          this._renderer.clearDepth();
+          this._renderer.render(this.localizerScene, this._camera);
+          this._changed = false;
         }
-
-        // localizers
-        this._renderer.clearDepth();
-        this._renderer.render(this.localizerScene, this._camera);
       }
 
       _onStackIndexChanged (index) {
@@ -604,9 +613,11 @@
 
       _stackWindowWidthChanged(width) {
         this.set('stackHelper.slice.windowWidth', width);
+        this._changed = true;
       }
       _stackWindowCenterChanged(center) {
         this.set('stackHelper.slice.windowCenter', center);
+        this._changed = true;
       }
 
       _onMouseMove(event) {

@@ -817,7 +817,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         for (let i = 0; i< this.contours.length; i++){
           this.contours[i].selected = (this.contours[i].label === contour) ? true: false;
         }
-
+        this._updateRenderers();
       }
 
       _userCaseChanged(userCase) {
@@ -871,6 +871,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             if(this.contours.length === 3 && imageLoaded) {
               this.loadingData = false;
+              this._updateRenderers();
             }
           });
         };
@@ -916,12 +917,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           stackScene0.add(stackHelper0);
 
           const stackHelper1 = new AMI.default.Helpers.Stack(stack);
+          stackHelper1.slice.intensityAuto = false;
           stackHelper1.slice.windowWidth = this.userCase.image.windowWidth;
           stackHelper1.slice.windowCenter= this.userCase.image.windowLevel;
           const stackScene1 = new THREE.Scene();
           stackScene1.add(stackHelper1);
 
           const stackHelper2 = new AMI.default.Helpers.Stack(stack);
+          stackHelper2.slice.intensityAuto = false;
           stackHelper2.slice.windowWidth = this.userCase.image.windowWidth;
           stackHelper2.slice.windowCenter= this.userCase.image.windowLevel;
           const stackScene2 = new THREE.Scene();
@@ -959,6 +962,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
           if(this.contours.length === 3 && imageLoaded) {
             this.loadingData = false;
+            this._updateRenderers();
           }
         });
 
@@ -984,6 +988,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.$.first.resize();
         this.$.second.resize();
         this.$.third.resize();
+
+        this._updateRenderers();
       }
 
       _submitAnswer() {
@@ -1019,6 +1025,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.$.third.stackIndex = ijk.getComponent((stackHelper2.orientation + 2) % 3);
 
         this._updateLocalizers();
+        this._updateRenderers();
       }
 
       _stackIndexChanged(index) {
@@ -1026,6 +1033,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           return;
         }
         this._updateLocalizers();
+        this._updateRenderers();
       }
 
       _updateLocalizers() {
@@ -1159,6 +1167,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.contours[i].meshBack.visible = visible;
           this.contours[i].meshFront.visible = visible;
         }
+        this._updateRenderers();
+      }
+
+      _updateRenderers() {
+        this.$.first._changed = true;
+        this.$.second._changed = true;
+        this.$.third._changed = true;
       }
     }
 
