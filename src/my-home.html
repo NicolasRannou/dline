@@ -323,7 +323,13 @@
           },
           todo: {
             type: Number,
-            computed: '_computeTodo(allCases)'
+            computed: '_computeTodo(allCases)',
+            notify: true,
+          },
+          todoList: {
+            type: Array,
+            computed: '_computeTodoList(allCases)',
+            notify: true,
           },
           casesDone: {
             type: Array,
@@ -430,6 +436,11 @@
       _computeTodo(cases) {
         const todo = cases.filter((acase) => !acase.completed);
         return todo.length;
+      }
+
+      _computeTodoList(cases) {
+        const todo = cases.filter((acase) => !acase.completed);
+        return todo;
       }
     }
 

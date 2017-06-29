@@ -189,6 +189,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         text-decoration: none;
       }
 
+      a paper-button {
+        background-color: var(--default-primary-color);
+        color: #fff;
+      }
+
       .fulloff {
         height: 24px;
         padding: 0;
@@ -239,6 +244,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         -webkit-box-pack: center;
             -ms-flex-pack: center;
                 justify-content: center;
+      }
+
+      .next-link {
+        display: flex;
+      }
+
+      .next-button {
+        flex: 1;
       }
       /*a paper-button {
         background-color: var(--default-primary-color);
@@ -507,7 +520,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <div>Your answer has been registered.</div>
                 <div>[[userCase.answerDetails]]</div>
               </div>
-              
+              <a class="next-link" hidden$="[[_done(todo)]]" name="view3" href="case/[[_next(todo)]]">
+                <paper-button class="next-button">Next case</paper-button>
+              </a>
             </div>
 
           </div>
@@ -748,6 +763,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           answered: {
             type: Boolean,
             value: false,
+          },
+          todo: {
+            type: Array,
+            value: [],
+            observer: '_todoChanged',
           }
         };
       }
@@ -1174,6 +1194,26 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.$.first._changed = true;
         this.$.second._changed = true;
         this.$.third._changed = true;
+      }
+
+      _todoChanged(todo) {
+        if (todo === undefined) {
+          return;
+        }
+      }
+
+      _done(todo) {
+        return todo.length <= 0;
+      }
+
+      _next(todo) {
+        if (todo === undefined) {
+          return;
+        }
+
+        if (todo.length > 0) {
+          return todo[0].id;
+        }
       }
     }
 
