@@ -247,11 +247,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       .next-link {
+        display: -webkit-box;
+        display: -ms-flexbox;
         display: flex;
       }
 
       .next-button {
-        flex: 1;
+        -webkit-box-flex: 1;
+            -ms-flex: 1;
+                flex: 1;
       }
       /*a paper-button {
         background-color: var(--default-primary-color);

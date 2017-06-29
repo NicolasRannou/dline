@@ -7,9 +7,11 @@
 <link rel="import" href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
 <link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
 
+<link rel="import" href="../bower_components/iron-collapse/iron-collapse.html">
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/iron-icons/communication-icons.html">
 
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
@@ -36,10 +38,16 @@
       }
 
       .content {
+        display: -webkit-box;
+        display: -ms-flexbox;
         display: flex;
         height: 100%;
-        align-items: center;
-        justify-content: center;
+        -webkit-box-align: center;
+            -ms-flex-align: center;
+                align-items: center;
+        -webkit-box-pack: center;
+            -ms-flex-pack: center;
+                justify-content: center;
       }
 
       .message{
@@ -50,24 +58,70 @@
         font-weight: lighter;
       }
 
+      .maintitle {
+        font-size: 32px;
+        font-size: 32px;
+        text-align: center;
+        color: #d9d9d9;
+      }
+
+      .section {
+        font-size: 24px;
+        margin-top: 24px;
+        color: var(--disabled-text-color);
+      }
+
+      .section:hover {
+        cursor: pointer;
+        color: var(--secondary-text-color)
+      }
+
+      .subsection {
+        font-size: 18px;
+        font-weight: lighter;
+        color: var(--disabled-text-color);
+        color: #d9d9d9;
+      }
+
+      .subsection iron-icon {
+        margin-right: 8px;
+      }
+
+      .section > iron-icon {
+        color: var(--accent-color);
+      }
+
       .clickable:hover{
         color: grey;
         text-decoration: underline;
       }
 
-      .card {
-        width: 256px;
+      .container {
+        /*width: 256px;*/
         min-height: 0;
         margin: auto;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
       }
 
-      .card.large {
-        width: 368px;
+      .form {
+        width: 256px;
+        /*min-height: 0;*/
+      }
+
+      .info {
+        max-width: 512px;
       }
 
       iron-pages > div {
+        display: -webkit-box;
+        display: -ms-flexbox;
         display: flex;
-        flex-direction: column;
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+            -ms-flex-direction: column;
+                flex-direction: column;
       }
 
       iron-pages > div > * {
@@ -111,16 +165,36 @@
         </app-toolbar>
       </app-header>
       <div class="content">
+      <div class="container">
 
-    <!--<div class="container">-->
-      <div class="card large">
-        <div>Welcome to DLine</div>
-        <div>Learn</div>
-        <div>Help</div>
-        <div>More!</div>
-      </div>
-      <div class="card">
+        <div class="info">
+          <div class="maintitle">Welcome to ARCOL dummy run web platform</div>
+          <div class="section" on-tap="work">
+            <iron-icon icon="icons:chevron-right"></iron-icon> How does it work?</div>
+          <iron-collapse id="work" class="subsection">
+            <ul>
+              <li>Create an account</li>
+              <li>24 clinical cases proposed</li>
+              <li>Each case contains
+                <ul>
+                  <li>CBCT of day</li>
+                  <li>3 PVT of the 3 bladder volumes</li>
+                </ul>
+              </li>
+              <li>Provide best PTV and assess choice difficulty</li>
+            </ul>
+          </iron-collapse>
+          <div class="section" on-tap="help">
+            <iron-icon icon="icons:chevron-right"></iron-icon> Need help?</div>
+          <iron-collapse id="help" class="subsection">
+            <div>If you have any question or experience any issue, please contact us at:</div>
+            <div><iron-icon icon="communication:phone"></iron-icon>+33 2 99 25 30 57</div>
+            <div><iron-icon icon="icons:mail"></iron-icon>m.gobeli@rennes.unicancer.fr</div>
+          </iron-collapse>
+          
+        </div>
 
+        <div class="card form">
         <paper-tabs selected="{{selected}}">
           <paper-tab>Sign up</paper-tab>
           <paper-tab>Sign in</paper-tab>
@@ -189,7 +263,7 @@
           </div>
         </iron-pages>
       </div>
-    <!--</div>-->
+    </div>
 
           </div>
     </app-header-layout>
@@ -346,6 +420,14 @@
         if (e.keyCode === 13) {
           this._signIn();
         }
+      }
+
+      work() {
+        this.$.work.toggle();
+      }
+
+      help() {
+        this.$.help.toggle();
       }
     }
 
