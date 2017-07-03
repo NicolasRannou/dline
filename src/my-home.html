@@ -32,21 +32,17 @@
     <style include="shared-styles">
       :host {
         display: block;
-
         padding: 10px;
       }
 
-      app-drawer-layout:not([narrow]) [drawer-toggle] {
-        display: none;
+      .link {
+        cursor: auto;
+        text-decoration: none;
       }
 
-      app-header {
-        background-color: var(--dark-primary-color);
-        color: var(--text-primary-color);
-      }
-
-      app-header paper-icon-button {
-        --paper-icon-button-ink-color: white;
+      #button-link {
+        background-color: var(--default-primary-color);
+        color: #fff;
       }
 
       .drawer-list {
@@ -67,131 +63,152 @@
       }
 
       .container {
-        display: -webkit-flex;
+        display: -webkit-box;
+        display: -ms-flexbox;
         display: flex;
-        -webkit-justify-content: center;
-        justify-content: center;
-        -webkit-flex-wrap: wrap;
-        flex-wrap: wrap;
+        -webkit-box-pack: center;
+            -ms-flex-pack: center;
+                justify-content: center;
+        -ms-flex-wrap: wrap;
+            flex-wrap: wrap;
         margin-top: 15px;
         padding: 1.5%;
         -webkit-box-sizing: border-box;
-        -moz-box-sizing: border-box;
         box-sizing: border-box;
       }
 
-    paper-card {
-      width: 400px;
-      position: relative;
-      margin-bottom: 20px;
-      margin-right: 10px;
-      margin-left: 10px;
-      --paper-card-header-image:{
-        -moz-transition: all 0.1s;
-        -webkit-transition: all 0.1s;
-        transition: all 0.1s;
+      .cafe-header {
+        @apply --paper-font-headline;
+      }
+
+      .cafe-light {
+        color: var(--paper-grey-600);
+      }
+
+      .cafe-location {
+        float: right;
+        font-size: 15px;
+        vertical-align: middle;
+      }
+
+      .welcome {
+        min-height: 128px;
+        background-size: cover;
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-image: url('../images/image.png');
+        margin-bottom: 16px;
+      }
+
+      .emailTest {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-orient: horizontal;
+        -webkit-box-direction: normal;
+            -ms-flex-direction: row;
+                flex-direction: row;
+        -webkit-box-align: center;
+            -ms-flex-align: center;
+                align-items: center;
+        font-size: 18px;
+        font-weight: lighter;
+      }
+
+      .separator {
+        padding: 16px;
+        font-size: 14px;
+        font-weight: lighter;
+        color: #aaa;
+        border-top: 1px solid var(--divider-color);
+      }
+
+      .link {
+        cursor: auto;
+        text-decoration: none;
+      }
+
+      #button-link {
+        background-color: var(--default-primary-color);
+        color: #fff;
+      }
+
+      .completed {
+        color: var(--accent-color);
+      }
+      
+      app-drawer-layout:not([narrow]) [drawer-toggle] {
+        display: none;
+      }
+
+      app-header {
+        background-color: var(--dark-primary-color);
+        color: var(--text-primary-color);
+      }
+
+      app-header paper-icon-button {
+        --paper-icon-button-ink-color: white;
+      }
+
+      paper-card {
+        width: 400px;
+        position: relative;
+        margin-bottom: 20px;
+        margin-right: 10px;
+        margin-left: 10px;
+        --paper-card-header-image:{
+          -webkit-transition: all 0.1s;
+          -o-transition: all 0.1s;
+          transition: all 0.1s;
+          height: 256px;
+          -o-object-fit: cover;
+            object-fit: cover;
+          -webkit-filter: grayscale(.7);
+          filter: grayscale(.7);
+        };
+      }
+
+      iron-image {
         height: 256px;
-        object-fit: cover;
+        -webkit-transition: all 0.1s;
+        -o-transition: all 0.1s;
+        transition: all 0.1s;
+        -o-object-fit: cover;
+          object-fit: cover;
         -webkit-filter: grayscale(.7);
         filter: grayscale(.7);
-      };
-    }
-
-    iron-image {
-      height: 256px;
-      -moz-transition: all 0.1s;
-      -webkit-transition: all 0.1s;
-      transition: all 0.1s;
-      object-fit: cover;
-      -webkit-filter: grayscale(.7);
-      filter: grayscale(.7);
-    }
-
-    paper-card:hover {
-      @apply --shadow-elevation-12dp
-    }
-
-    paper-card:hover iron-image{
-      -webkit-filter: none;
-      filter: none;
-      -moz-transition: all 0.1s;
-      -webkit-transition: all 0.1s;
-      transition: all 0.1s;
-      -moz-transform: scale(1.01);
-      -webkit-transform: scale(1.01);
-      transform: scale(1.01);
-    }
-
-    @media (max-width: 300px) {
-      paper-card {
-		    width: 100%;
       }
-	  }
 
-    .cafe-header {
-      @apply --paper-font-headline;
-    }
+      paper-card:hover {
+        @apply --shadow-elevation-12dp
+      }
 
-    .cafe-light {
-      color: var(--paper-grey-600);
-    }
+      paper-card:hover iron-image{
+        -webkit-filter: none;
+        filter: none;
+        -webkit-transition: all 0.1s;
+        -o-transition: all 0.1s;
+        transition: all 0.1s;
+        -webkit-transform: scale(1.01);
+        -ms-transform: scale(1.01);
+            transform: scale(1.01);
+      }
 
-    .cafe-location {
-      float: right;
-      font-size: 15px;
-      vertical-align: middle;
-    }
+      @media (max-width: 300px) {
+        paper-card {
+          width: 100%;
+        }
+      }
 
-    iron-icon.star {
-      --iron-icon-width: 16px;
-      --iron-icon-height: 16px;
-      color: var(--paper-amber-500);
-    }
+      iron-icon.star {
+        --iron-icon-width: 16px;
+        --iron-icon-height: 16px;
+        color: var(--paper-amber-500);
+      }
 
-    iron-icon.star.grey{
-      color: var(--paper-grey-500);
-    }
-
-    .welcome {
-      min-height: 128px;
-      background-size: cover;
-      background-position: center center;
-      background-repeat: no-repeat;
-      background-image: url('../images/image.png');
-      margin-bottom: 16px;
-    }
-
-    .email {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      font-size: 18px;
-      font-weight: lighter;
-    }
-
-    .separator {
-      padding: 16px;
-      font-size: 14px;
-      font-weight: lighter;
-      color: #aaa;
-      border-top: 1px solid var(--divider-color);
-    }
-
-    a {
-      color: -webkit-link;
-      cursor: auto;
-      text-decoration: none;
-    }
-
-    a paper-button {
-      background-color: var(--default-primary-color);
-      color: #fff;
-    }
-
-    .completed {
-      color: var(--accent-color);
-    }
-
+      iron-icon.star.grey{
+        color: var(--paper-grey-500);
+      }
     </style>
 
     <firebase-auth
@@ -239,9 +256,9 @@
           <app-toolbar>
             <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
             <div main-title>DLINE - Contouring Atlases</div>
-            <div class="email">
-          <div>{{user.email}}</div><paper-icon-button icon="icons:exit-to-app" on-tap="_handleLogout"></paper-icon-button>
-        </div>
+            <div class="emailTest">
+              <div>{{user.email}}</div><paper-icon-button icon="icons:exit-to-app" on-tap="_handleLogout"></paper-icon-button>
+            </div>
           </app-toolbar>
         </app-header>
 
@@ -277,7 +294,8 @@
               </div>
               <div class="card-actions">
                 <div class="horizontal justified">
-                  <a name="view3" href="case/[[mycase.id]]"><paper-button>Open</paper-button></a>
+                  <a class="link" name="view3" href="case/[[mycase.id]]">
+                    <paper-button id="button-link">Open</paper-button></a>
                   <!--<paper-button disabled>Contouring</paper-button> -->
                 </div>
               </div>
