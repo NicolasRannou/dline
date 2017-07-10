@@ -337,7 +337,7 @@
           },
           completed: {
             type: Number,
-            computed: '_computeCompleted(allCases)'
+            computed: '_computeCompleted(allCases)',
           },
           todo: {
             type: Number,
@@ -389,7 +389,7 @@
         }
 
         const tagArray = [];
-        for (const value in tagSet) {
+        for(const value in tagSet) {
           tagArray.push({
             value: value,
             count: tagSet[value],
@@ -414,7 +414,6 @@
            this.set(['allCases', i, 'completed'], true);
            this.allCases = this.allCases.slice();
           }
-
         }
       }
 

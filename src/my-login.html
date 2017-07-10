@@ -1,5 +1,6 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../bower_components/polymer/lib/elements/dom-if.html">
+<link rel="import" href="../bower_components/polymer/lib/elements/dom-repeat.html">
 
 <link rel="import" href="../bower_components/neon-animation/web-animations.html">
 
@@ -158,6 +159,18 @@
       path="/users/[[user.uid]]/preferences">
     </firebase-query>
 
+    <firebase-query
+      id="FBQueryPosition"
+      path="/positions"
+      data="{{positions}}">
+    </firebase-query>
+
+    <firebase-query
+      id="FBQueryAffiliation"
+      path="/affiliations"
+      data="{{affiliations}}">
+    </firebase-query>
+
     <app-header-layout fullbleed has-scrolling-region>
       <app-header slot="header" fixed condenses effects="waterfall">
         <app-toolbar>
@@ -177,7 +190,7 @@
               <li>24 clinical cases proposed</li>
               <li>Each case contains
                 <ul>
-                  <li>the CBCT of day</li>
+                  <li>CBCT of day</li>
                   <li>3 PVT corresponding to the 3 bladder volumes</li>
                 </ul>
               </li>
@@ -217,7 +230,7 @@
               minlength="6"
               char-counter
               label="Password"
-              error-message="Must be at lest 6 characters" required></paper-input>
+              error-message="Must be at least 6 characters" required></paper-input>
             <paper-input
               id="signupPasswordConfirm"
               type="password"
@@ -228,14 +241,26 @@
               required></paper-input>
             <paper-dropdown-menu
               id="signupTitle"
-              label="Profesion"
-              selected-item-label="{{title}}" required>
+              label="Position"
+              selected-item-label="{{title}}"
+              selected-item="{{positionItem}}"
+              required>
               <paper-listbox slot="dropdown-content" selected="{{titleIndex}}">
-                <paper-item>Intern</paper-item>
-                <paper-item>Medical Doctor</paper-item>
-                <paper-item>Physicist</paper-item>
-                <paper-item>Technician</paper-item>
-                <paper-item>Other</paper-item>
+                <template is="dom-repeat" items="[[positions]]" as="position">
+                  <paper-item db-index="[[position.id]]">[[position.label]]</paper-item>
+                </template>
+              </paper-listbox>
+            </paper-dropdown-menu>
+            <paper-dropdown-menu
+              id="signupTitle"
+              label="Affiliation"
+              selected-item-label="{{affiliation}}"
+              selected-item="{{affiliationItem}}"
+              required>
+              <paper-listbox slot="dropdown-content" selected="{{affiliationIndex}}">
+                <template is="dom-repeat" items="[[affiliations]]" as="affiliation">
+                  <paper-item db-index="[[affiliation.id]]">[[affiliation.label]]</paper-item>
+                </template>
               </paper-listbox>
             </paper-dropdown-menu>
             <paper-button type="submit" on-tap="_signUp">Sign Up</paper-button>
@@ -308,7 +333,20 @@
             type: Boolean,
             observer: '_signedInChanged',
           },
-          newTitle: {
+          positionItem: {
+            type: Object,
+            value: {},
+            observer: '_positionItemChanged',
+          },
+          newPosition: {
+            type: String,
+          },
+          affiliationItem: {
+            type: Object,
+            value: {},
+            observer: '_affiliationItemChanged',
+          },
+          newAffiliation: {
             type: String,
           },
         };
@@ -335,27 +373,28 @@
           validPassword &&
           validPasswordConfirm &&
           validTitle) {
-
           // sign up and sign in!
-          this.newTitle = this.title;
+          this.newAffiliation = this.title;
+          this.newPosition = this.title;
           this.$.FBAuth.createUserWithEmailAndPassword(this.email, this.password);
         }
       }
 
       _handleEmailPWError(err) {
-        if(err.detail.code === "auth/wrong-password"){
+        if(err.detail.code === 'auth/wrong-password'){
           // sign in with wrong password
           this.$.signinPassword.invalid = true;
           this.forgotPassword = true;
           this.forgotEmail = false;
-        } else if(err.detail.code === "auth/user-not-found") {
+        } else if(err.detail.code === 'auth/user-not-found') {
           // sign in with wrong email
           this.$.signinEmail.invalid = true;
           this.forgotPassword = false;
           this.forgotEmail = true;
-        } else if(err.detail.code === "auth/email-already-in-use") {
+        } else if(err.detail.code === 'auth/email-already-in-use') {
           // sign up with wrong email
-          this.newTitle = undefined;
+          this.newAffiliation = undefined;
+          this.newPosition = undefined;
           this.$.signupPassword.invalid = true;
           this.forgotPassword = true;
           this.forgotEmail = false;
@@ -369,7 +408,7 @@
         this.password = undefined;
         this.passwordMatch = undefined;
       }
-  
+
       _resetPassword() {
         const validEmail = this.$.signinEmail.validate();
         if (validEmail) {
@@ -400,6 +439,8 @@
       _signedInChanged(signedIn) {
         this.password = undefined;
         this.passwordMatch = undefined;
+        this.affiliation = undefined;
+        this.affiliationIndex = undefined;
         this.title = undefined;
         this.titleIndex = undefined;
         this.selected = 1;
@@ -408,11 +449,18 @@
       }
 
       _userChanged(user) {
-        if (this.newTitle !== undefined) {
+        const afItem = this.affiliationItem.dbIndex;
+        const poItem = this.positionItem.dbIndex;
+        if (this.newPosition !== undefined &&
+          this.newAffiliation !== undefined &&
+          afItem !== undefined &&
+          poItem !== undefined) {
           this.$.FBSave.ref.push({
-            title: this.title,
+            affiliation: afItem,
+            position: poItem,
           });
-          this.newTitle = undefined;
+          this.newAffiliation = undefined;
+          this.newPosition = undefined;
         }
       }
 
@@ -428,6 +476,22 @@
 
       help() {
         this.$.help.toggle();
+      }
+
+      _positionItemChanged(positionItem) {
+        if(positionItem === null) {
+          return;
+        }
+        console.log(positionItem);
+        console.log(positionItem.dbIndex);
+      }
+
+      _affiliationItemChanged(affiliationItem) {
+        if(affiliationItem === null) {
+          return;
+        }
+        console.log(affiliationItem);
+        console.log(affiliationItem.dbIndex);
       }
     }
 
