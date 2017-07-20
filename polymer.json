@@ -13,6 +13,7 @@
     "bower.json"
   ],
   "extraDependencies": [
+    "CNAME",
     "manifest.json",
     "bower_components/web-animations-js/*.js",
     "bower_components/webcomponentsjs/*.js",
