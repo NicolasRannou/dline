@@ -856,9 +856,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.loadingData = true;
 
         // load the models
-        const loadSTLObject = (object) => {
-          const stlLoader = new THREE.STLLoader();
-          stlLoader.load(object.location, (geometry) => {
+        const loadVTKObject = (object) => {
+          const vtkLoader = new THREE.VTKLoader();
+          vtkLoader.load(object.location, (geometry) => {
             object.scene = new THREE.Scene();
 
             // front
@@ -905,12 +905,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           contour.color = model.color;
           contour.label = model.label;
           contour.location = model.location;
-          loadSTLObject(contour);
+          loadVTKObject(contour);
         }
 
         // fetch new data
         // [userCase.image]
-        let loader = new AMI.default.Loaders.Volume();
+        let loader = new AMI.VolumeLoader();
         loader.on('fetch-start', (evt) => {
           this.fetchProgress = 1;
         });
@@ -929,10 +929,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           })
         .then((series) => {
           this.set('series', series);
-          
+
           // create stack scenes
           const stack = series.stack[0];
-          const stackHelper0 = new AMI.default.Helpers.Stack(stack);
+          const stackHelper0 = new AMI.StackHelper(stack);
           stackHelper0.slice.intensityAuto = false;
           stackHelper0.slice.windowWidth = this.userCase.image.windowWidth;
           stackHelper0.slice.windowCenter= this.userCase.image.windowLevel;
@@ -940,14 +940,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           const stackScene0 = new THREE.Scene();
           stackScene0.add(stackHelper0);
 
-          const stackHelper1 = new AMI.default.Helpers.Stack(stack);
+          const stackHelper1 = new AMI.StackHelper(stack);
           stackHelper1.slice.intensityAuto = false;
           stackHelper1.slice.windowWidth = this.userCase.image.windowWidth;
           stackHelper1.slice.windowCenter= this.userCase.image.windowLevel;
           const stackScene1 = new THREE.Scene();
           stackScene1.add(stackHelper1);
 
-          const stackHelper2 = new AMI.default.Helpers.Stack(stack);
+          const stackHelper2 = new AMI.StackHelper(stack);
           stackHelper2.slice.intensityAuto = false;
           stackHelper2.slice.windowWidth = this.userCase.image.windowWidth;
           stackHelper2.slice.windowCenter= this.userCase.image.windowLevel;
