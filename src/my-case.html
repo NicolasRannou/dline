@@ -56,7 +56,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         background-color: #fff;
       }
 
-      .answer {
+      .tools {
         display:-webkit-box;
         display:-ms-flexbox;
         display:flex;
@@ -499,20 +499,30 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </app-toolbar>
       </app-header>
       <div class="content">
-          <div class="answer">
-            <div class="separator">Best PVT is:</div>
+          <div class="tools">
+            <div class="separator" >Futur Toolkit:   </div>
+              <paper-checkbox class="label"  checked >Show/hide all </paper-checkbox>
+              <div class="separator" >   </div>
+  <template is="dom-repeat" items="{{userCase.models}}" as="userCase"  >
+
+    <paper-checkbox class="label"  checked={{redShow}} >{{userCase.label}} </paper-checkbox>
+  </template>
+    <div class="separator"> Rappel clinique   </div>
+  <object data="[[userCase.clinic]]" type="text/html" />
+</object>
+  <div class="separator"> Bilbiographie   </div>
+<object data="[[userCase.biblio]]" type="text/html" />
+</object>
+
+
+            <p class="cafe-light"></p>
             <paper-radio-group selected="{{contour}}">
-              <paper-radio-button name="red">red</paper-radio-button>
-              <paper-radio-button name="green">green</paper-radio-button>
-              <paper-radio-button name="blue">blue</paper-radio-button>
-              <paper-radio-button name="none">none</paper-radio-button>
+
             </paper-radio-group>
+            <!--
             <div class="separator">Decision was:</div>
             <paper-radio-group selected="{{choice}}">
-              <paper-radio-button name="easy">easy</paper-radio-button>
-              <paper-radio-button name="average">average</paper-radio-button>
-              <paper-radio-button name="hard">hard</paper-radio-button>
-              <paper-radio-button name="veryhard">very hard</paper-radio-button>
+
             </paper-radio-group>
             <paper-button
               on-tap="_submitAnswer"
@@ -528,8 +538,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <paper-button class="next-button">Next case</paper-button>
               </a>
             </div>
-
+    -->
           </div>
+
           <div class="viewers">
             <template is="dom-if" if="[[loadingData]]">
               <div class="loader">
@@ -764,6 +775,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             value: true,
             observer: '_showChanged',
           },
+          oneShow: {
+
+            type:Boolean,
+            value: true,
+            observer: '_showChanged',
+          },
           answered: {
             type: Boolean,
             value: false,
@@ -908,6 +925,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           loadVTKObject(contour);
         }
 
+
+
         // fetch new data
         // [userCase.image]
         let loader = new AMI.VolumeLoader();
@@ -978,6 +997,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.redShow = true;
           this.greenShow = true;
           this.blueShow = true;
+          this.oneShow = true;
 
           // update flags
           imageLoaded = true;
