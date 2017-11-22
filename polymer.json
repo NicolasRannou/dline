@@ -5,7 +5,8 @@
     "src/my-login.html",
     "src/my-case.html",
     "src/my-home.html",
-    "src/my-view404.html"
+    "src/my-view404.html",
+    "src/my-presentation.html"
   ],
   "sources": [
     "src/**/*",

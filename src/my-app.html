@@ -11,6 +11,7 @@
 <link rel="lazy-import" href="my-home.html">
 <link rel="lazy-import" href="my-case.html">
 <link rel="lazy-import" href="my-view404.html">
+<link rel="lazy-import" href="my-presentation.html">
 
 <dom-module id="my-app">
   <template>
@@ -99,6 +100,7 @@
     </firebase-auth>
 
     <iron-pages
+
         selected="[[page]]"
         attr-for-selected="name"
         fallback-selection="view404"
@@ -112,8 +114,12 @@
         name="case"
         route-data="[[routeData]]"
         todo=[[todo]]></my-case>
+        <my-presentation name="presentation">
+
+        </my-presentation>
       <my-view404
         name="view404"></my-view404>
+
     </iron-pages>
   </template>
 

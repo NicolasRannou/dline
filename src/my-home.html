@@ -236,14 +236,16 @@
         <div class="welcome"></div>
         <div class="tags">
           <paper-listbox selected="{{filter}}" attr-for-selected="label" selectable=".label">
-            <div class="separator">Filter</div>
+
             <paper-item label="all" class="label">All cases ([[allCases.length]])</paper-item>
+            <!--
             <paper-item label="completed" class="label">Completed ([[completed]])</paper-item>
-            <paper-item label="todo" class="label">To do ([[todo]])</paper-item>
-            <!--<div class="separator">All labels</div>
+            <paper-item label="todo" class="label">To do ([[todo]])</paper-item>-->
+  <div class="separator">Filter</div>
+            <!--<div class="separator">All labels</div>-->
             <template is="dom-repeat" items="{{tags}}" as="tag">
               <paper-item label$="[[tag.value]]" class="label">[[tag.value]] ([[tag.count]])</paper-item>
-            </template>-->
+            </template>
           </paper-listbox>
         </div>
         </div>
@@ -256,7 +258,7 @@
         <app-header slot="header" condenses reveals effects="waterfall">
           <app-toolbar>
             <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
-            <div main-title>Dline - Contouring Atlases</div>
+            <div main-title>Dline - Contouring Atlase</div>
             <div class="emailTest">
               <div>{{user.email}}</div><paper-icon-button icon="icons:exit-to-app" on-tap="_handleLogout"></paper-icon-button>
             </div>
@@ -267,9 +269,9 @@
 
           <template is="dom-repeat" items="{{allCases}}" as="mycase" filter="{{_filterCases(filter)}}">
             <paper-card>
-              <!--<iron-image style="width:400px; height:256ps; background-color: lightgray;"
+              <iron-image style="width:400px; height:256ps; background-color: lightgray;"
                 sizing="cover" preload src="[[mycase.cover]]"></iron-image>
-              </iron-image>-->
+              </iron-image>
               <div class="card-content">
                 <div class="cafe-header">[[mycase.title]]
                   <div class="cafe-location cafe-light">
@@ -289,16 +291,18 @@
                   <iron-icon class$="{{_fillStar(3, mycase.difficulty)}}" icon="star"></iron-icon>
                   <iron-icon class$="{{_fillStar(4, mycase.difficulty)}}" icon="star"></iron-icon>
                   <iron-icon class$="{{_fillStar(5, mycase.difficulty)}}" icon="star"></iron-icon>
-                </div>
-                <p>Author・[[mycase.author]]</p>-->
+                </div>-->
+                <p>Author・[[mycase.author]]</p>
 
                 <p class="cafe-light">[[mycase.description]]</p>
               </div>
               <div class="card-actions">
                 <div class="horizontal justified">
+                  <a class="link" name="presentation" href="presentation">
+                    <paper-button id="button-link">clinique</paper-button></a>
                   <a class="link" name="view3" href="case/[[mycase.id]]">
                     <paper-button id="button-link">Open</paper-button></a>
-                  <!--<paper-button disabled>Contouring</paper-button> -->
+                  <paper-button disabled>Contouring</paper-button>
                 </div>
               </div>
             </paper-card>
