@@ -6,6 +6,7 @@
     "src/my-case.html",
     "src/my-home.html",
     "src/my-view404.html",
+    "src/my-new-view.html",
     "src/my-presentation.html"
   ],
   "sources": [
