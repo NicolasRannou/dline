@@ -234,6 +234,9 @@
       <app-drawer id="drawer" slot="drawer">
         <div style="height: 100%; overflow: auto;">
         <div class="welcome"></div>
+        <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
+              <a name="new-view" href="[[rootPath]]new-view">New view</a>
+            </iron-selector>
         <div class="tags">
           <paper-listbox selected="{{filter}}" attr-for-selected="label" selectable=".label">
 
@@ -258,7 +261,7 @@
         <app-header slot="header" condenses reveals effects="waterfall">
           <app-toolbar>
             <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
-            <div main-title>Dline - Contouring Atlase</div>
+            <div main-title>Contouring Atlase</div>
             <div class="emailTest">
               <div>{{user.email}}</div><paper-icon-button icon="icons:exit-to-app" on-tap="_handleLogout"></paper-icon-button>
             </div>
@@ -298,7 +301,8 @@
               </div>
               <div class="card-actions">
                 <div class="horizontal justified">
-                  <a class="link" name="presentation" href="presentation">
+
+                  <a class="link" name="new-view" href="/new-view">
                     <paper-button id="button-link">clinique</paper-button></a>
                   <a class="link" name="view3" href="case/[[mycase.id]]">
                     <paper-button id="button-link">Open</paper-button></a>
@@ -310,6 +314,7 @@
           </template>
 
         </div>
+
       </app-header-layout>
     </app-drawer-layout>
   </template>
