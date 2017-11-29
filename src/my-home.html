@@ -27,6 +27,7 @@
 
 <link rel="import" href="shared-styles.html">
 
+
 <dom-module id="my-home">
   <template>
     <style include="shared-styles">
@@ -234,9 +235,8 @@
       <app-drawer id="drawer" slot="drawer">
         <div style="height: 100%; overflow: auto;">
         <div class="welcome"></div>
-        <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
-              <a name="new-view" href="[[rootPath]]new-view">New view</a>
-            </iron-selector>
+<paper-item  class="label">
+      <a name="new-view" class = "link" href="new-view/">Who we are  </a> </paper-item>
         <div class="tags">
           <paper-listbox selected="{{filter}}" attr-for-selected="label" selectable=".label">
 
@@ -288,6 +288,7 @@
                     </template>
                   </div>
                 </div>
+
                 <!--<div class="cafe-rating">
                   <iron-icon class$="{{_fillStar(1, mycase.difficulty)}}" icon="star"></iron-icon>
                   <iron-icon class$="{{_fillStar(2, mycase.difficulty)}}" icon="star"></iron-icon>
@@ -302,7 +303,7 @@
               <div class="card-actions">
                 <div class="horizontal justified">
 
-                  <a class="link" name="new-view" href="/new-view">
+                  <a class="link" name="new-view" href="case/[[mycase.id]]/new-view">
                     <paper-button id="button-link">clinique</paper-button></a>
                   <a class="link" name="view3" href="case/[[mycase.id]]">
                     <paper-button id="button-link">Open</paper-button></a>
@@ -317,6 +318,8 @@
 
       </app-header-layout>
     </app-drawer-layout>
+
+
   </template>
 
   <script>
@@ -374,8 +377,17 @@
         return [
           '_userCasesChanged(userCases.splices)',
           '_casesDoneChanged(casesDone.splices)',
+
         ];
       }
+
+      _routePageChanged(routeData) {
+        // Polymer 2.0 will call with `undefined` on initialization.
+        // Ignore until we are properly called with a string.
+        console.log('Path changed!');
+        if (routeData === undefined) {
+          return;
+        }}
 
       _userChanged(user) {
         console.log(user);

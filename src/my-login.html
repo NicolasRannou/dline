@@ -264,6 +264,7 @@
               </paper-listbox>
             </paper-dropdown-menu>
             <paper-button type="submit" on-tap="_signUp">Sign Up</paper-button>
+              <paper-button id ="btnLogin" on-tap="_signUpAnonymously">Login anonymously</paper-button>
             <p hidden$="[[!forgotPassword]]" class="message">Email already registered.</p>
           </div>
           <div>
@@ -352,6 +353,9 @@
         };
       }
 
+
+
+
       _signIn(e) {
         // validate
         const validEmail = this.$.signinEmail.validate();
@@ -361,6 +365,15 @@
           this.$.FBAuth.signInWithEmailAndPassword(this.email, this.password);
         }
       }
+      _signUpAnonymously(e) {
+        firebase.auth().signInAnonymously();
+        firebase.auth().onAuthStateChanged(firebaseUser => {
+          console.log(firebaseUser);
+        });
+      }
+
+
+
 
       _signUp(e) {
         // validate
@@ -495,6 +508,10 @@
       }
     }
 
+
     window.customElements.define(MyLogin.is, MyLogin);
+
+
+
   </script>
 </dom-module>
