@@ -22,11 +22,10 @@
 <!-- Defines the element's style and local DOM -->
 
   <template>
-    <style>
+    <style include="shared-styles">
       :host {
         display: block;
 
-        padding: 16px;
       }
     </style>
 
@@ -49,12 +48,14 @@
     </firebase-query>
 
 
-
+<div class= "card">
     <h1>New view   [[userCase.id]] </h1>
+  </div>
+  <div class= "card">
     <a class="link" name="view3" href="case/[[userCase.id]]">
       <paper-button id="button-link">Open</paper-button></a>
     <paper-button disabled>Contouring</paper-button>
-
+</div>
   </template>
 
   <script>
