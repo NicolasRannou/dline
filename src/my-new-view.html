@@ -1,7 +1,22 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
-<link rel="import" href="../bower_components/app-route/app-route.html">
-<link rel="import" href="../bower_components/app-route/app-location.html">
-<link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="../bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../bower_components/polymer/lib/elements/dom-if.html">
+
+<link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
+
+<link rel="import" href="../bower_components/iron-collapse/iron-collapse.html">
+
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-radio-button/paper-radio-button.html">
+<link rel="import" href="../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../bower_components/paper-slider/paper-slider.html">
+
+<link rel="import" href="../bower_components/polymerfire/firebase-auth.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-query.html">
 
   <dom-module id="my-new-view">
 <!-- Defines the element's style and local DOM -->
@@ -24,16 +39,82 @@
     <firebase-query
       id="FBQuery"
       path="/cases"
-      data="{{cases}}">
+      data="{{cases}}"
+      equal-to="[[page]]">
     </firebase-query>
 
-    <h1>New view</h1>
+    <firebase-query
+      id="FBSave"
+      path="/users/[[user.uid]]/cases">
+    </firebase-query>
+
+
+
+    <h1>New view   [[userCase.id]] </h1>
+    <a class="link" name="view3" href="case/[[userCase.id]]">
+      <paper-button id="button-link">Open</paper-button></a>
+    <paper-button disabled>Contouring</paper-button>
+
   </template>
+
   <script>
 
     // Your new element extends the Polymer.Element base class
     class MyNewView extends Polymer.Element {
       static get is() { return 'my-new-view'; }
+
+      static get properties() {
+        return {
+          routeData: {
+            type: Object,
+            value: {},
+          },
+          page: {
+            type: String,
+            reflectToAttribute: true,
+          },
+          user: {
+            type: Object,
+            value: {},
+          },
+          cases: {
+            type: Array,
+          },
+          userCase: {
+            type: Object,
+            observer: '_userCaseChanged',
+          }
+        };
+      }
+
+      static get observers() {
+        return [
+          '_routePageChanged(routeData.*)',
+          '_casesChanged(cases.splices)',
+        ];
+      }
+
+      _routePageChanged(routeData) {
+
+        this.page = routeData.value.subpage;
+        // start rendering loops
+      }
+      _userCaseChanged(userCase) {
+        if (userCase === null ||
+            !userCase.id) {
+          return;
+        }
+      }
+              _casesChanged(cases) {
+                if (cases === undefined ||
+                cases.indexSplices[0].object.length !== 1) {
+                  return;
+                }
+
+                this.set('userCase', cases.indexSplices[0].object[0])
+              }
+
+
     }
     //Now, register your new custom element so the browser can use it
     customElements.define(MyNewView.is, MyNewView);

@@ -11,7 +11,7 @@
     "lint": "npm run lint:javascript",
     "lint:javascript": "eslint . --ext js,html --ignore-path .gitignore",
     "dev": "polymer serve | npm run watch",
-      "test": "polymer test",
+    "test": "polymer test",
     "watch": "browser-sync start --proxy localhost:8080 --files \"src/**/*.*, index.html, *.js\"",
     "test:integration": "polymer build # test that psk builds without error with the CLI"
   },
@@ -31,6 +31,7 @@
   },
   "homepage": "https://github.com/Bruit/dline-vtk#readme",
   "dependencies": {
-    "browser-sync": "^2.18.13"
+    "browser-sync": "^2.18.13",
+    "git-cli": "^0.10.0"
   }
 }
