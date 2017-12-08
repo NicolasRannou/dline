@@ -61,23 +61,36 @@
 
 <div class= "card">
     <h1>  [[userCase.description]] </h1>
-  </div><div class= "card">
-      <p>  [[userCase.descriptiondata.hdm]] <p>
+  </div>
+
+<div class= "card">
+  <div class= "description">
+    <h1> Histoire de la maladie </h1>
+      <p id="hdm">   <p>
     </div>
-    <div class= "card">
+  </div>
+
+<div class= "card">
+        <h1> Examens complémentaires </h1>
       <div class = "description">
-        <p id="desc"></p>
+        <p id="tdm"></p>
       </div>
+</div>
+<div class= "card">
+        <h1> Examen clinique </h1>
+      <div class = "description">
+        <p id="ec"></p>
       </div>
+</div>
 
 
-    
   <div class= "card">
 
     <a class="link" name="view3" href="case/[[userCase.id]]">
       <paper-button id="button-link">Open</paper-button></a>
     <paper-button disabled>Contouring</paper-button>
 </div>
+
   </template>
 
   <script>
@@ -114,17 +127,20 @@
         return [
           '_routePageChanged(routeData.*)',
           '_casesChanged(cases.splices)',
-            '_descriptionDisplay(userCase)',
+          '_descriptionDisplay(userCase)',
         ];
       }
       _descriptionDisplay(userCase) {
-
               // The item description contains escaped HTML (e.g. "&lt;br&gt;"), so we need to
               // unescape it ("<br>") and set it as innerHTML.
-              let text = userCase ? userCase.descriptiondata.tdm : '';
-              this.$.desc.innerHTML = this._unescapeText(text);
-
+              var text = userCase ? userCase.descriptiondata.hdm : '';
+              this.$.hdm.innerHTML = this._unescapeText(text);
               // Reset the select menus.
+              var text = userCase ? userCase.descriptiondata.tdm : '';
+              this.$.tdm.innerHTML = this._unescapeText(text);
+
+              var text = userCase ? userCase.descriptiondata.ec : '';
+              this.$.ec.innerHTML = this._unescapeText(text);
             }
 
       _unescapeText(text) {
