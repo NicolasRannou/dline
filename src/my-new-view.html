@@ -18,6 +18,8 @@
 <link rel="import" href="../bower_components/polymerfire/firebase-auth.html">
 <link rel="import" href="../bower_components/polymerfire/firebase-query.html">
 
+<link rel="import" href="elements/ami-viewer-2D.html">
+
   <dom-module id="my-new-view">
 <!-- Defines the element's style and local DOM -->
 
@@ -26,6 +28,15 @@
       :host {
         display: block;
 
+      }
+      .viewer {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-flex: 1;
+            -ms-flex: 1;
+                flex: 1;
+        width: 0;
       }
     </style>
 
@@ -49,9 +60,20 @@
 
 
 <div class= "card">
-    <h1>New view   [[userCase.id]] </h1>
-  </div>
+    <h1>  [[userCase.description]] </h1>
+  </div><div class= "card">
+      <p>  [[userCase.descriptiondata.hdm]] <p>
+    </div>
+    <div class= "card">
+      <div class = "description">
+        <p id="desc"></p>
+      </div>
+      </div>
+
+
+    
   <div class= "card">
+
     <a class="link" name="view3" href="case/[[userCase.id]]">
       <paper-button id="button-link">Open</paper-button></a>
     <paper-button disabled>Contouring</paper-button>
@@ -92,7 +114,23 @@
         return [
           '_routePageChanged(routeData.*)',
           '_casesChanged(cases.splices)',
+            '_descriptionDisplay(userCase)',
         ];
+      }
+      _descriptionDisplay(userCase) {
+
+              // The item description contains escaped HTML (e.g. "&lt;br&gt;"), so we need to
+              // unescape it ("<br>") and set it as innerHTML.
+              let text = userCase ? userCase.descriptiondata.tdm : '';
+              this.$.desc.innerHTML = this._unescapeText(text);
+
+              // Reset the select menus.
+            }
+
+      _unescapeText(text) {
+        let elem = document.createElement('textarea');
+        elem.innerHTML = text;
+        return elem.textContent;
       }
 
       _routePageChanged(routeData) {
