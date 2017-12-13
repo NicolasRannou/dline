@@ -74,6 +74,10 @@
           <paper-item class = "link" href="#anchorHdm" on-tap="_onTapAnchor">HDM</paper-item>
             <paper-item class = "link" href="#anchorEc" on-tap="_onTapAnchor">Examen clinique</paper-item>
           <paper-item class = "link" href="#anchorTdm" on-tap="_onTapAnchor">Examens complémentaires</paper-item>
+            <paper-item class = "link" href="#anchorTdm" on-tap="_onTapAnchor">Traitement </paper-item>
+            <paper-item class = "link" href="#anchorTdm" on-tap="_onTapAnchor">Bibliographie </paper-item>
+
+
 
         </paper-listbox>
       </app-drawer>
@@ -89,12 +93,12 @@
         </app-toolbar>
       </app-header>
 
-<div class= "card">
+<div class= "card" id = "anchorHdm">
     <h1>  [[userCase.description]] </h1>
 
   </div>
 
-<div class= "card" id = "anchorHdm">
+<div class= "card" >
   <div class= "description" >
     <h1> Histoire de la maladie </h1>
       <p id="hdm">   <p>
@@ -118,7 +122,7 @@
   <div class= "card">
 
     <a class="link" name="view3" href="case/[[userCase.id]]">
-      <paper-button id="button-link">Open</paper-button></a>
+      <paper-button id="button-link">Open atlas</paper-button></a>
     <paper-button disabled>Contouring</paper-button>
 </div>
 
