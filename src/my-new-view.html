@@ -2,23 +2,22 @@
 <link rel="import" href="../bower_components/polymer/lib/elements/dom-repeat.html">
 <link rel="import" href="../bower_components/polymer/lib/elements/dom-if.html">
 
+<link rel="import" href="../bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
 <link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
 <link rel="import" href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
 <link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
 
-<link rel="import" href="../bower_components/iron-collapse/iron-collapse.html">
-
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
-<link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
-<link rel="import" href="../bower_components/paper-radio-button/paper-radio-button.html">
-<link rel="import" href="../bower_components/paper-radio-group/paper-radio-group.html">
-<link rel="import" href="../bower_components/paper-slider/paper-slider.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
+
 
 <link rel="import" href="../bower_components/polymerfire/firebase-auth.html">
 <link rel="import" href="../bower_components/polymerfire/firebase-query.html">
-
-<link rel="import" href="elements/ami-viewer-2D.html">
 
   <dom-module id="my-new-view">
 <!-- Defines the element's style and local DOM -->
@@ -37,6 +36,14 @@
             -ms-flex: 1;
                 flex: 1;
         width: 0;
+      }
+
+      app-header {
+        background-color: var(--dark-primary-color);
+        color: var(--text-primary-color);
+      }
+      app-header paper-icon-button {
+        --paper-icon-button-ink-color: white;
       }
     </style>
 
@@ -58,9 +65,43 @@
       path="/users/[[user.uid]]/cases">
     </firebase-query>
 
+    <app-drawer-layout fullbleed>
+      <!-- Drawer content -->
+
+
+      <app-drawer id="drawer" slot="drawer">
+        <paper-listbox>
+          <paper-item class = "link" href="new-view/" >HDM</paper-item>
+          <paper-item>Examen complémentaire</paper-item>
+
+        </paper-listbox>
+        <div role="listbox">
+        <a class="paper-item-link" href="#inbox" tabindex="-1">
+          <paper-item>Inbox</paper-item>
+        </a>
+        <a class="paper-item-link" href="#starred" tabindex="-1">
+          <paper-item>Starred</paper-item>
+        </a>
+        <a class="paper-item-link" href="new-view/[[userCase.id]]#tdm" tabindex="-1">
+          <paper-item>Sent mail</paper-item>
+        </a>
+      </div>
+      </app-drawer>
+    <app-header-layout >
+
+      <app-header slot="header" condenses reveals effects="waterfall">
+        <app-toolbar>
+          <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
+          <!--<div main-title>Contouring Atlase</div>-->
+          <div class="emailTest">
+            <div>{{user.email}}</div><paper-icon-button icon="icons:exit-to-app" on-tap="_handleLogout"></paper-icon-button>
+          </div>
+        </app-toolbar>
+      </app-header>
 
 <div class= "card">
     <h1>  [[userCase.description]] </h1>
+
   </div>
 
 <div class= "card">
@@ -69,19 +110,19 @@
       <p id="hdm">   <p>
     </div>
   </div>
-
+  <div class= "card">
+          <h1> Examen clinique </h1>
+        <div class = "description">
+          <p id="ec"></p>
+        </div>
+  </div>
 <div class= "card">
         <h1> Examens complémentaires </h1>
       <div class = "description">
         <p id="tdm"></p>
       </div>
 </div>
-<div class= "card">
-        <h1> Examen clinique </h1>
-      <div class = "description">
-        <p id="ec"></p>
-      </div>
-</div>
+
 
 
   <div class= "card">
@@ -91,6 +132,8 @@
     <paper-button disabled>Contouring</paper-button>
 </div>
 
+</app-header-layout>
+</app-drawer-layout >
   </template>
 
   <script>
