@@ -71,21 +71,11 @@
 
       <app-drawer id="drawer" slot="drawer">
         <paper-listbox>
-          <paper-item class = "link" href="new-view/" >HDM</paper-item>
-          <paper-item>Examen complémentaire</paper-item>
+          <paper-item class = "link" href="#anchorHdm" on-tap="_onTapAnchor">HDM</paper-item>
+            <paper-item class = "link" href="#anchorEc" on-tap="_onTapAnchor">Examen clinique</paper-item>
+          <paper-item class = "link" href="#anchorTdm" on-tap="_onTapAnchor">Examens complémentaires</paper-item>
 
         </paper-listbox>
-        <div role="listbox">
-        <a class="paper-item-link" href="#inbox" tabindex="-1">
-          <paper-item>Inbox</paper-item>
-        </a>
-        <a class="paper-item-link" href="#starred" tabindex="-1">
-          <paper-item>Starred</paper-item>
-        </a>
-        <a class="paper-item-link" href="new-view/[[userCase.id]]#tdm" tabindex="-1">
-          <paper-item>Sent mail</paper-item>
-        </a>
-      </div>
       </app-drawer>
     <app-header-layout >
 
@@ -104,19 +94,19 @@
 
   </div>
 
-<div class= "card">
-  <div class= "description">
+<div class= "card" id = "anchorHdm">
+  <div class= "description" >
     <h1> Histoire de la maladie </h1>
       <p id="hdm">   <p>
     </div>
   </div>
-  <div class= "card">
+  <div class= "card" id = "anchorEc">
           <h1> Examen clinique </h1>
         <div class = "description">
           <p id="ec"></p>
         </div>
   </div>
-<div class= "card">
+<div class= "card" id = "anchorTdm">
         <h1> Examens complémentaires </h1>
       <div class = "description">
         <p id="tdm"></p>
@@ -190,6 +180,13 @@
         let elem = document.createElement('textarea');
         elem.innerHTML = text;
         return elem.textContent;
+      }
+
+      _onTapAnchor(e) {
+      e.preventDefault();
+        var anchor = e.target.getAttribute("href");
+      //  console.log(anchor);
+    Polymer.dom(this.root).querySelector(anchor).scrollIntoView();
       }
 
       _routePageChanged(routeData) {
