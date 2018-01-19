@@ -1,0 +1,221 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../bower_components/polymer/lib/elements/dom-if.html">
+
+<link rel="import" href="../bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
+<link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
+
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
+
+
+<link rel="import" href="../bower_components/polymerfire/firebase-auth.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-query.html">
+
+  <dom-module id="my-new-view">
+<!-- Defines the element's style and local DOM -->
+
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: block;
+
+      }
+      .viewer {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-flex: 1;
+            -ms-flex: 1;
+                flex: 1;
+        width: 0;
+      }
+
+      app-header {
+        background-color: var(--dark-primary-color);
+        color: var(--text-primary-color);
+      }
+      app-header paper-icon-button {
+        --paper-icon-button-ink-color: white;
+      }
+    </style>
+
+
+    <firebase-auth
+      id="FBAuth"
+      user="{{user}}">
+    </firebase-auth>
+
+    <firebase-query
+      id="FBQuery"
+      path="/cases"
+      data="{{cases}}"
+      equal-to="[[page]]">
+    </firebase-query>
+
+    <firebase-query
+      id="FBSave"
+      path="/users/[[user.uid]]/cases">
+    </firebase-query>
+
+    <app-drawer-layout fullbleed>
+      <!-- Drawer content -->
+
+
+      <app-drawer id="drawer" slot="drawer">
+        <paper-listbox>
+          <paper-item class = "link" href="#anchorHdm" on-tap="_onTapAnchor">HDM</paper-item>
+            <paper-item class = "link" href="#anchorEc" on-tap="_onTapAnchor">Examen clinique</paper-item>
+          <paper-item class = "link" href="#anchorTdm" on-tap="_onTapAnchor">Examens complémentaires</paper-item>
+            <paper-item class = "link" href="#anchorTdm" on-tap="_onTapAnchor">Traitement </paper-item>
+            <paper-item class = "link" href="#anchorTdm" on-tap="_onTapAnchor">Bibliographie </paper-item>
+
+
+
+        </paper-listbox>
+      </app-drawer>
+    <app-header-layout >
+
+      <app-header slot="header" condenses reveals effects="waterfall">
+        <app-toolbar>
+          <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
+          <!--<div main-title>Contouring Atlase</div>-->
+          <div class="emailTest">
+            <div>{{user.email}}</div><paper-icon-button icon="icons:exit-to-app" on-tap="_handleLogout"></paper-icon-button>
+          </div>
+        </app-toolbar>
+      </app-header>
+
+<div class= "card" id = "anchorHdm">
+    <h1>  [[userCase.description]] </h1>
+
+  </div>
+
+<div class= "card" >
+  <div class= "description" >
+    <h1> Histoire de la maladie </h1>
+      <p id="hdm">   <p>
+    </div>
+  </div>
+  <div class= "card" id = "anchorEc">
+          <h1> Examen clinique </h1>
+        <div class = "description">
+          <p id="ec"></p>
+        </div>
+  </div>
+<div class= "card" id = "anchorTdm">
+        <h1> Examens complémentaires </h1>
+      <div class = "description">
+        <p id="tdm"></p>
+      </div>
+</div>
+
+
+
+  <div class= "card">
+
+    <a class="link" name="view3" href="case/[[userCase.id]]">
+      <paper-button id="button-link">Open atlas</paper-button></a>
+    <paper-button disabled>Contouring</paper-button>
+</div>
+
+</app-header-layout>
+</app-drawer-layout >
+  </template>
+
+  <script>
+
+    // Your new element extends the Polymer.Element base class
+    class MyNewView extends Polymer.Element {
+      static get is() { return 'my-new-view'; }
+
+      static get properties() {
+        return {
+          routeData: {
+            type: Object,
+            value: {},
+          },
+          page: {
+            type: String,
+            reflectToAttribute: true,
+          },
+          user: {
+            type: Object,
+            value: {},
+          },
+          cases: {
+            type: Array,
+          },
+          userCase: {
+            type: Object,
+            observer: '_userCaseChanged',
+          }
+        };
+      }
+
+      static get observers() {
+        return [
+          '_routePageChanged(routeData.*)',
+          '_casesChanged(cases.splices)',
+          '_descriptionDisplay(userCase)',
+        ];
+      }
+      _descriptionDisplay(userCase) {
+              // The item description contains escaped HTML (e.g. "&lt;br&gt;"), so we need to
+              // unescape it ("<br>") and set it as innerHTML.
+              var text = userCase ? userCase.descriptiondata.hdm : '';
+              this.$.hdm.innerHTML = this._unescapeText(text);
+              // Reset the select menus.
+              var text = userCase ? userCase.descriptiondata.tdm : '';
+              this.$.tdm.innerHTML = this._unescapeText(text);
+
+              var text = userCase ? userCase.descriptiondata.ec : '';
+              this.$.ec.innerHTML = this._unescapeText(text);
+            }
+
+      _unescapeText(text) {
+        let elem = document.createElement('textarea');
+        elem.innerHTML = text;
+        return elem.textContent;
+      }
+
+      _onTapAnchor(e) {
+      e.preventDefault();
+        var anchor = e.target.getAttribute("href");
+      //  console.log(anchor);
+    Polymer.dom(this.root).querySelector(anchor).scrollIntoView();
+      }
+
+      _routePageChanged(routeData) {
+
+        this.page = routeData.value.subpage;
+        // start rendering loops
+      }
+      _userCaseChanged(userCase) {
+        if (userCase === null ||
+            !userCase.id) {
+          return;
+        }
+      }
+              _casesChanged(cases) {
+                if (cases === undefined ||
+                cases.indexSplices[0].object.length !== 1) {
+                  return;
+                }
+
+                this.set('userCase', cases.indexSplices[0].object[0])
+              }
+
+
+    }
+    //Now, register your new custom element so the browser can use it
+    customElements.define(MyNewView.is, MyNewView);
+  </script>
+</dom-module>

@@ -174,37 +174,30 @@
     <app-header-layout fullbleed has-scrolling-region>
       <app-header slot="header" fixed condenses effects="waterfall">
         <app-toolbar>
-          <div main-title>DLINE - Contouring Atlases</div>
+          <div main-title>DLINE - Contouring Atlases for radioherapist</div>
         </app-toolbar>
       </app-header>
       <div class="content">
       <div class="container">
 
         <div class="info">
-          <div class="maintitle">Welcome to the ARCOL dummy run web platform</div>
-          <div class="section" on-tap="work">
-            <iron-icon icon="icons:chevron-right"></iron-icon> How does it work?</div>
-          <iron-collapse id="work" class="subsection">
-            <ul>
-              <li>Create an account</li>
-              <li>24 clinical cases proposed</li>
-              <li>Each case contains
-                <ul>
-                  <li>CBCT of day</li>
-                  <li>3 PVT corresponding to the 3 bladder volumes</li>
-                </ul>
-              </li>
-              <li>Provide best PTV and assess choice difficulty</li>
-            </ul>
-          </iron-collapse>
-          <div class="section" on-tap="help">
-            <iron-icon icon="icons:chevron-right"></iron-icon> Need help?</div>
-          <iron-collapse id="help" class="subsection">
-            <div>If you have any question or experience any issue, please contact us at:</div>
-            <div><iron-icon icon="communication:phone"></iron-icon>+33 2 99 25 30 57</div>
-            <div><iron-icon icon="icons:mail"></iron-icon>maxime.gobeli@gmail.com</div>
-          </iron-collapse>
-          
+    <div class = "card ">
+      Dline offer you a <b> free </b> online database. All clinicals cases are well documented and all delineations are reviewed by an expert.
+      We provide you bilbiographic data for each case. 
+
+    </div>
+    <div class = "card ">
+      <b>Soon </b>we will give you the opportunity to make online delineations in order to compare your daily delineations practice with an expert.
+      We want to create a community to discuss and comment contouring and delineation.
+
+    </div>
+    <div class = "card ">
+      You want to help ? </br>
+      Why not!, feel free to contact us.
+
+      <div><iron-icon icon="icons:mail"></iron-icon>maxime.gobeli@gmail.com</div>
+
+    </div>
         </div>
 
         <div class="card form">
@@ -239,31 +232,10 @@
               label="Confirm Password"
               error-message="Do not match password"
               required></paper-input>
-            <paper-dropdown-menu
-              id="signupTitle"
-              label="Position"
-              selected-item-label="{{title}}"
-              selected-item="{{positionItem}}"
-              required>
-              <paper-listbox slot="dropdown-content" selected="{{titleIndex}}">
-                <template is="dom-repeat" items="[[positions]]" as="position">
-                  <paper-item db-index="[[position.id]]">[[position.label]]</paper-item>
-                </template>
-              </paper-listbox>
-            </paper-dropdown-menu>
-            <paper-dropdown-menu
-              id="signupTitle"
-              label="Affiliation"
-              selected-item-label="{{affiliation}}"
-              selected-item="{{affiliationItem}}"
-              required>
-              <paper-listbox slot="dropdown-content" selected="{{affiliationIndex}}">
-                <template is="dom-repeat" items="[[affiliations]]" as="affiliation">
-                  <paper-item db-index="[[affiliation.id]]">[[affiliation.label]]</paper-item>
-                </template>
-              </paper-listbox>
-            </paper-dropdown-menu>
+
+
             <paper-button type="submit" on-tap="_signUp">Sign Up</paper-button>
+              <paper-button id ="btnLogin" on-tap="_signUpAnonymously">Login anonymously</paper-button>
             <p hidden$="[[!forgotPassword]]" class="message">Email already registered.</p>
           </div>
           <div>
@@ -283,6 +255,7 @@
               on-keydown="_passwordKeyDown"
               error-message="Invalid password" required></paper-input>
             <paper-button on-tap="_signIn">Sign In</paper-button>
+              <paper-button id ="btnLogin" on-tap="_signUpAnonymously">Login anonymously</paper-button>
             <p hidden$="[[!forgotPassword]]"><a href="#" class="clickable message" on-click="_resetPassword">Incorrect password. Email new password?</a></p>
             <p hidden$="[[!forgotEmail]]"><a href="#" class="clickable message" on-click="_gotoSignUp">Unkown email. Create account?</a></p>
           </div>
@@ -352,6 +325,9 @@
         };
       }
 
+
+
+
       _signIn(e) {
         // validate
         const validEmail = this.$.signinEmail.validate();
@@ -361,18 +337,28 @@
           this.$.FBAuth.signInWithEmailAndPassword(this.email, this.password);
         }
       }
+      _signUpAnonymously(e) {
+        firebase.auth().signInAnonymously();
+        firebase.auth().onAuthStateChanged(firebaseUser => {
+          console.log(firebaseUser);
+        });
+      }
+
+
+
 
       _signUp(e) {
         // validate
         const validEmail = this.$.signupEmail.validate();
         const validPassword = this.$.signupPassword.validate();
         const validPasswordConfirm = !this._passwordMismatch(this.passwordMatch);
-        const validTitle = this.$.signupTitle.validate();
+    // const validTitle = this.$.signupTitle.validate();
 
         if (validEmail &&
           validPassword &&
-          validPasswordConfirm &&
-          validTitle) {
+          validPasswordConfirm ) {
+
+            // && validTitle
           // sign up and sign in!
           this.newAffiliation = this.title;
           this.newPosition = this.title;
@@ -495,6 +481,10 @@
       }
     }
 
+
     window.customElements.define(MyLogin.is, MyLogin);
+
+
+
   </script>
 </dom-module>

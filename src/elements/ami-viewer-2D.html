@@ -234,7 +234,7 @@
         this._changed = true;
 
         this._initScene();
-        this._initCamera();
+        this._initCamera(1);
         this._initControls();
         this._initRenderer();
         this._initLocalizers();
@@ -260,7 +260,7 @@
       }
 
       _initCamera() {
-        this._camera = new AMI.default.Cameras.Orthographic(
+        this._camera = new AMI.OrthographicCamera(
           this._container.clientWidth / -2,
           this._container.clientWidth / 2,
           this._container.clientHeight / -2,
@@ -270,7 +270,7 @@
 
       _initControls() {
         this._controls =
-          new AMI.default.Controls.TrackballOrtho(this._camera, this._container);
+          new AMI.TrackballOrthoControl(this._camera, this._container);
         this._controls.staticMoving = true;
         this._controls.noRotate = true;
         this._controls.target.set(0, 0, 0);
@@ -314,7 +314,7 @@
         );
 
         // material
-        const uniformsLayerMix = AMI.default.Shaders.ContourUniform.uniforms();
+        const uniformsLayerMix = AMI.ContourUniformShader.uniforms();
         uniformsLayerMix.uTextureFilled.value =
           this._contourTextureTarget.texture;
         uniformsLayerMix.uWidth.value = 1.0;
@@ -323,8 +323,8 @@
         uniformsLayerMix.uCanvasHeight.value =
           this._contourTextureTarget.height;
 
-        const fls = new AMI.default.Shaders.ContourFragment(uniformsLayerMix);
-        const vls = new AMI.default.Shaders.ContourVertex();
+        const fls = new AMI.ContourFragmentShader(uniformsLayerMix);
+        const vls = new AMI.ContourVertexShader();
         this._contourMaterial = new THREE.ShaderMaterial({
           side: THREE.DoubleSide,
           uniforms: uniformsLayerMix,
@@ -409,7 +409,7 @@
           const slice = this.stackHelper.slice;
           const referencePlane = slice.cartesianEquation();
 
-          this.localizerHelper = new AMI.default.Helpers.Localizer(
+          this.localizerHelper = new AMI.LocalizerHelper(
             stack, slice.geometry, referencePlane);
 
           this.localizerHelper.canvasWidth =
@@ -640,11 +640,11 @@
         const intersects = raycaster.intersectObject(this._scene, true);
         if (intersects.length > 0) {
           let ijk =
-            AMI.default.Models.Stack.worldToData(this.stackHelper.stack, intersects[0].point);
+            AMI.StackModel.worldToData(this.stackHelper.stack, intersects[0].point);
           this.mouseI = ijk.x;
           this.mouseJ = ijk.y;
           this.mouseK = ijk.z;
-          this.mouseValue = AMI.default.Models.Stack.value(this.stackHelper.stack, ijk);
+          this.mouseValue = AMI.StackModel.value(this.stackHelper.stack, ijk);
         }
       }
     }

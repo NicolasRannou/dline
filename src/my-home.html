@@ -24,8 +24,10 @@
 <link rel="import" href="../bower_components/polymerfire/firebase-query.html">
 
 <link rel="import" href="my-icons.html">
+<link rel="import" href="../bower_components/iron-icons/hardware-icons.html">
 
 <link rel="import" href="shared-styles.html">
+
 
 <dom-module id="my-home">
   <template>
@@ -93,10 +95,11 @@
 
       .welcome {
         min-height: 128px;
-        background-size: cover;
+        margin-top:2px;
+        background-size: contain;
         background-position: center center;
         background-repeat: no-repeat;
-        background-image: url('../images/image.png');
+        background-image: url('../images/logo4.png');
         margin-bottom: 16px;
       }
 
@@ -136,7 +139,7 @@
       .completed {
         color: var(--accent-color);
       }
-      
+
       app-drawer-layout:not([narrow]) [drawer-toggle] {
         display: none;
       }
@@ -233,16 +236,21 @@
       <app-drawer id="drawer" slot="drawer">
         <div style="height: 100%; overflow: auto;">
         <div class="welcome"></div>
+<paper-item  class="label">
+
+      <a name="new-view" class = "link" href="new-view/">Who we are  </a> </paper-item>
         <div class="tags">
           <paper-listbox selected="{{filter}}" attr-for-selected="label" selectable=".label">
-            <div class="separator">Filter</div>
+
             <paper-item label="all" class="label">All cases ([[allCases.length]])</paper-item>
+            <!--
             <paper-item label="completed" class="label">Completed ([[completed]])</paper-item>
-            <paper-item label="todo" class="label">To do ([[todo]])</paper-item>
-            <!--<div class="separator">All labels</div>
+            <paper-item label="todo" class="label">To do ([[todo]])</paper-item>-->
+  <div class="separator">Filter</div>
+            <!--<div class="separator">All labels</div>-->
             <template is="dom-repeat" items="{{tags}}" as="tag">
               <paper-item label$="[[tag.value]]" class="label">[[tag.value]] ([[tag.count]])</paper-item>
-            </template>-->
+            </template>
           </paper-listbox>
         </div>
         </div>
@@ -255,7 +263,7 @@
         <app-header slot="header" condenses reveals effects="waterfall">
           <app-toolbar>
             <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
-            <div main-title>DLINE - Contouring Atlases</div>
+            <div main-title>Contouring Atlase</div>
             <div class="emailTest">
               <div>{{user.email}}</div><paper-icon-button icon="icons:exit-to-app" on-tap="_handleLogout"></paper-icon-button>
             </div>
@@ -266,9 +274,9 @@
 
           <template is="dom-repeat" items="{{allCases}}" as="mycase" filter="{{_filterCases(filter)}}">
             <paper-card>
-              <!--<iron-image style="width:400px; height:256ps; background-color: lightgray;"
+              <iron-image style="width:400px; height:256ps; background-color: lightgray;"
                 sizing="cover" preload src="[[mycase.cover]]"></iron-image>
-              </iron-image>-->
+              </iron-image>
               <div class="card-content">
                 <div class="cafe-header">[[mycase.title]]
                   <div class="cafe-location cafe-light">
@@ -282,21 +290,31 @@
                     </template>
                   </div>
                 </div>
+
                 <!--<div class="cafe-rating">
                   <iron-icon class$="{{_fillStar(1, mycase.difficulty)}}" icon="star"></iron-icon>
                   <iron-icon class$="{{_fillStar(2, mycase.difficulty)}}" icon="star"></iron-icon>
                   <iron-icon class$="{{_fillStar(3, mycase.difficulty)}}" icon="star"></iron-icon>
                   <iron-icon class$="{{_fillStar(4, mycase.difficulty)}}" icon="star"></iron-icon>
                   <iron-icon class$="{{_fillStar(5, mycase.difficulty)}}" icon="star"></iron-icon>
-                </div>
-                <p>Author・[[mycase.author]]</p>-->
+                </div>-->
+                <p>Author・[[mycase.author]]</p>
+
                 <p class="cafe-light">[[mycase.description]]</p>
               </div>
               <div class="card-actions">
                 <div class="horizontal justified">
+                  <div class="card-actions">
+                      <paper-icon-button icon="favorite"></paper-icon-button>
+                      <paper-icon-button icons:description></paper-icon-button>
+                      <paper-icon-button icon="social:share"></paper-icon-button>
+                    </div>
+
+                  <a class="link" name="new-view" href="new-view/[[mycase.id]]/">
+                    <paper-button id="button-link">View Case</paper-button></a>
                   <a class="link" name="view3" href="case/[[mycase.id]]">
-                    <paper-button id="button-link">Open</paper-button></a>
-                  <!--<paper-button disabled>Contouring</paper-button> -->
+                    <paper-button id="button-link">Open atlas</paper-button></a>
+                  <paper-button disabled>Contouring</paper-button>
                 </div>
               </div>
             </paper-card>
@@ -304,8 +322,11 @@
           </template>
 
         </div>
+
       </app-header-layout>
     </app-drawer-layout>
+
+
   </template>
 
   <script>
@@ -363,8 +384,17 @@
         return [
           '_userCasesChanged(userCases.splices)',
           '_casesDoneChanged(casesDone.splices)',
+
         ];
       }
+
+      _routePageChanged(routeData) {
+        // Polymer 2.0 will call with `undefined` on initialization.
+        // Ignore until we are properly called with a string.
+        console.log('Path changed!');
+        if (routeData === undefined) {
+          return;
+        }}
 
       _userChanged(user) {
         console.log(user);
